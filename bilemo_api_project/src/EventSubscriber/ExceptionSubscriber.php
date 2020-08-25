@@ -25,6 +25,10 @@ class ExceptionSubscriber implements EventSubscriberInterface
             $response->headers->replace($exception->getHeaders());
         } else {
             $response->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+            $response->setJson("");
+            $response->setData([
+                'message' => $exception->getMessage()
+            ]);
         }
         $event->setResponse($response);
     }

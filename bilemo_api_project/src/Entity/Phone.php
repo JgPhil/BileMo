@@ -27,15 +27,10 @@ class Phone
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"show"})
+     * @Groups("show")
      */
     private $description;
 
-    /**
-     * @ORM\Column(type="datetime")
-     * @Groups({"show"})
-     */
-    private $released_at;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -45,9 +40,14 @@ class Phone
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"show"})
+     * @Groups("show")
      */
     private $color;
+
+    /**
+     * @ORM\Column(type="date")
+     */
+    private $released_at;
 
     public function getId(): ?int
     {

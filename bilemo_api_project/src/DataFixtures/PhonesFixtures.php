@@ -22,7 +22,6 @@ class PhonesFixtures extends Fixture
             $phone->setPrice(rand(200, 1000));
             $phone->setDescription($faker->sentence(3));
             $phone->setReleasedAt($faker->dateTimeThisYear());
-
             $manager->persist($phone);
         }
 
