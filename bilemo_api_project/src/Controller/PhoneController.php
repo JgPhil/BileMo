@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
@@ -49,7 +50,7 @@ class PhoneController extends AbstractController
     /**
      * @Route("/phones", name="add_phone", methods={"POST"})
      */
-    public function new(Request $request, EntityManagerInterface $entityManager)
+    public function new(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator)
     {
         $encoder = new JsonEncoder();
 
@@ -70,6 +71,13 @@ class PhoneController extends AbstractController
         $serializer = new Serializer([$normalizer], [$encoder]);
 
         $phone = $serializer->deserialize($request->getContent(), Phone::class, 'json');
+        $errors = $validator->validate($phone);
+        if (count($errors)) {
+            $errors = $serializer->serialize($errors, 'json');
+            return new Response($errors, 500, [
+                'Content-Type' => 'application/json'
+            ]);
+        }
         $entityManager->persist($phone);
         $entityManager->flush();
         $data = [
