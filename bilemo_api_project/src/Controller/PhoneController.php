@@ -61,6 +61,7 @@ class PhoneController extends AbstractController
         $defaultContext = [
             AbstractNormalizer::CALLBACKS => [
                 'createdAt' => $dateCallback,
+                'releasedAt' => $dateCallback
             ],
         ];
 
