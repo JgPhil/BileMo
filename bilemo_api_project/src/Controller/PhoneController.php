@@ -93,10 +93,10 @@ class PhoneController extends AbstractController
         //Setters Construction
         foreach ($data as $key => $value) {
             if ($key && !empty($value)) {
-                if (preg_match('/_/', $key)) { 
+                if (preg_match('/_/', $key)) {
                     $value = new DateTime($value);
                     $key = str_replace("_", "", $key);
-                    $key = str_replace(strrchr($key, "a"),"At", $key) ;
+                    $key = str_replace(strrchr($key, "a"), "At", $key);
                 }
                 $name = ucfirst($key);
                 $setter = 'set' . $name;
@@ -116,5 +116,16 @@ class PhoneController extends AbstractController
             'message' => 'Le téléphone a bien été mis à jour'
         ];
         return new JsonResponse($data);
+    }
+
+
+    /**
+     * @Route("/phones/{id}", name="delete_phone", methods={"DELETE"})
+     */
+    public function delete(Phone $phone, EntityManagerInterface $entityManager)
+    {
+        $entityManager->remove($phone);
+        $entityManager->flush();
+        return new Response(null, 204);
     }
 }
