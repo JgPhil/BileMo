@@ -6,9 +6,12 @@ use App\Repository\PhoneRepository;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=PhoneRepository::class)
+ * @UniqueEntity("name")
  */
 class Phone
 {
@@ -21,14 +24,17 @@ class Phone
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(name="name", type="string", length=255)
      * @Groups({"list", "show"})
+     * @Assert\NotBlank(message="Le champ ne doit pas être vide")
+     * @Assert\Length(min="2", minMessage="Ce champ doit contenir un minimum de {{ limit }} caractères", max="255", maxMessage="Ce champ doit contenir un maximum de {{ limit }} caractères")
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups("show")
+     * @Assert\NotBlank(message="Le champ ne doit pas être vide")
      */
     private $description;
 
@@ -36,12 +42,16 @@ class Phone
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"list", "show"})
+     * @Assert\Range(min="0", max="1500")
+     * @Assert\NotBlank(message="Ce champ ne doit pas être vide")
+     * @Assert\Range(min="0", minMessage="La valeur minimum autorisée est {{ limit }}", max="1500", maxMessage="La valeur maximum autorisée est {{ limit }}")
      */
     private $price;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups("show")
+     * @Assert\NotBlank
      */
     private $color;
 
