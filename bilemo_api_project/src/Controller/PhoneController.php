@@ -93,15 +93,13 @@ class PhoneController extends AbstractController
         //Setters Construction
         foreach ($data as $key => $value) {
             if ($key && !empty($value)) {
-                if (preg_match('/_/', $key)) {
+                if (preg_match('/_/', $key)) { 
+                    $value = new DateTime($value);
                     $key = str_replace("_", "", $key);
                     $key = str_replace(strrchr($key, "a"),"At", $key) ;
                 }
                 $name = ucfirst($key);
                 $setter = 'set' . $name;
-                if ($setter === "setReleasedAt"){
-                    $value = new DateTime($value);
-                }
                 $phoneUpdate->$setter($value);
             }
         }
