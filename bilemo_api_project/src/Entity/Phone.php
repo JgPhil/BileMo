@@ -6,6 +6,7 @@ use App\Repository\PhoneRepository;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=PhoneRepository::class)
@@ -23,12 +24,15 @@ class Phone
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"list", "show"})
+     * @Assert\Length(min="2", max="255")
+     * @Assert\NotBlank
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups("show")
+     * @Assert\NotBlank
      */
     private $description;
 
@@ -36,12 +40,15 @@ class Phone
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"list", "show"})
+     * @Assert\Range(min="0", max="1500")
+     * @Assert\NotBlank
      */
     private $price;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups("show")
+     * @Assert\NotBlank
      */
     private $color;
 
