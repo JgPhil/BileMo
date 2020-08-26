@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\PhoneRepository;
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -27,15 +28,10 @@ class Phone
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"show"})
+     * @Groups("show")
      */
     private $description;
 
-    /**
-     * @ORM\Column(type="datetime")
-     * @Groups({"show"})
-     */
-    private $released_at;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -45,9 +41,22 @@ class Phone
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"show"})
+     * @Groups("show")
      */
     private $color;
+
+    /**
+     * @ORM\Column(type="datetime")
+     * @Groups("show")
+     */
+    private $releasedAt;
+
+
+    public function __construct()
+    {
+        $this->releasedAt = new DateTime();
+    }
+
 
     public function getId(): ?int
     {
@@ -78,17 +87,6 @@ class Phone
         return $this;
     }
 
-    public function getReleasedAt(): ?\DateTimeInterface
-    {
-        return $this->released_at;
-    }
-
-    public function setReleasedAt(\DateTimeInterface $released_at): self
-    {
-        $this->released_at = $released_at;
-
-        return $this;
-    }
 
     public function getPrice(): ?string
     {
@@ -113,4 +111,17 @@ class Phone
 
         return $this;
     }
+
+    public function getReleasedAt(): ?\DateTimeInterface
+    {
+        return $this->releasedAt;
+    }
+
+    public function setReleasedAt(\DateTimeInterface $releasedAt): self
+    {
+        $this->releasedAt = $releasedAt;
+
+        return $this;
+    }
 }
+

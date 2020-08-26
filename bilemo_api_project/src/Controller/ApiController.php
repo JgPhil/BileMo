@@ -11,9 +11,11 @@ class ApiController extends AbstractController
     /**
      * @Route("/api", name="api")
      */
-    public function index(PhoneRepository $phoneRepo)
+    public function index()
     {
-        $data = $phoneRepo->findAll();
+        $data = [
+            "message" => "Bienvenue"
+        ];
 
         return $this->json($data, 200);
     }
