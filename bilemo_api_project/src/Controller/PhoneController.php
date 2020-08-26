@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use DateTime;
 use App\Entity\Phone;
 use App\Repository\PhoneRepository;
 use Doctrine\ORM\Mapping\Annotation;
@@ -10,10 +11,10 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -25,6 +26,18 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
  */
 class PhoneController extends AbstractController
 {
+    private $encoder;
+    private $normalizer;
+    private $serializer;
+
+
+
+    public function __construct()
+    {
+        $this->encoder = new JsonEncoder();
+        $this->normalizer = new GetSetMethodNormalizer(null, null, null, null, null, $this->getDefaultContext());
+        $this->serializer = new Serializer([$this->normalizer], [$this->encoder]);
+    }
 
     /**
      * @Route("/phones/{id}", name="show_phone", methods={"GET"})
@@ -52,28 +65,10 @@ class PhoneController extends AbstractController
      */
     public function new(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator)
     {
-        $encoder = new JsonEncoder();
-
-        // all callback parameters are optional (you can omit the ones you don't use)
-        $dateCallback = function ($innerObject, $outerObject, string $attributeName, string $format = null, array $context = []) {
-            return $innerObject instanceof \DateTime ? $innerObject->format(\DateTime::ISO8601) : '';
-        };
-
-        $defaultContext = [
-            AbstractNormalizer::CALLBACKS => [
-                'createdAt' => $dateCallback,
-                'releasedAt' => $dateCallback
-            ],
-        ];
-
-        $normalizer = new GetSetMethodNormalizer(null, null, null, null, null, $defaultContext);
-
-        $serializer = new Serializer([$normalizer], [$encoder]);
-
-        $phone = $serializer->deserialize($request->getContent(), Phone::class, 'json');
+        $phone = $this->serializer->deserialize($request->getContent(), Phone::class, 'json');
         $errors = $validator->validate($phone);
         if (count($errors)) {
-            $errors = $serializer->serialize($errors, 'json');
+            $errors = $this->serializer->serialize($errors, 'json');
             return new Response($errors, 500, [
                 'Content-Type' => 'application/json'
             ]);
@@ -85,5 +80,43 @@ class PhoneController extends AbstractController
             'message' => 'Le téléphone a bien été ajouté'
         ];
         return $this->json($data, 201);
+    }
+
+
+    /**
+     * @Route("/phones/{id}", name="update_phone", methods={"PUT"})
+     */
+    public function update(Request $request, Phone $phone, ValidatorInterface $validator, EntityManagerInterface $entityManager)
+    {
+        $phoneUpdate = $entityManager->getRepository(Phone::class)->find($phone->getId());
+        $data = json_decode($request->getContent());
+        //Setters Construction
+        foreach ($data as $key => $value) {
+            if ($key && !empty($value)) {
+                if (preg_match('/_/', $key)) {
+                    $key = str_replace("_", "", $key);
+                    $key = str_replace(strrchr($key, "a"),"At", $key) ;
+                }
+                $name = ucfirst($key);
+                $setter = 'set' . $name;
+                if ($setter === "setReleasedAt"){
+                    $value = new DateTime($value);
+                }
+                $phoneUpdate->$setter($value);
+            }
+        }
+        $errors = $validator->validate($phoneUpdate);
+        if (count($errors)) {
+            $errors = $this->serializer->serialize($errors, 'json');
+            return new Response($errors, 500, [
+                'Content-Type' => 'application/json'
+            ]);
+        }
+        $entityManager->flush();
+        $data = [
+            'status' => 200,
+            'message' => 'Le téléphone a bien été mis à jour'
+        ];
+        return new JsonResponse($data);
     }
 }
