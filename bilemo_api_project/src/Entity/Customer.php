@@ -6,6 +6,7 @@ use App\Repository\CustomerRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=CustomerRepository::class)
@@ -16,21 +17,25 @@ class Customer
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"user_read", "customer_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"user_read", "customer_read"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"user_read", "customer_read"})
      */
     private $email;
 
     /**
-     * @ORM\OneToMany(targetEntity=User::class, mappedBy="client", orphanRemoval=true)
+     * @Groups("customer_read")
+     * @ORM\OneToMany(targetEntity=User::class, mappedBy="customer", orphanRemoval=true)
      */
     private $users;
 
@@ -80,7 +85,6 @@ class Customer
     {
         if (!$this->users->contains($user)) {
             $this->users[] = $user;
-            $user->setClient($this);
         }
 
         return $this;
@@ -90,10 +94,6 @@ class Customer
     {
         if ($this->users->contains($user)) {
             $this->users->removeElement($user);
-            // set the owning side to null (unless already changed)
-            if ($user->getClient() === $this) {
-                $user->setClient(null);
-            }
         }
 
         return $this;

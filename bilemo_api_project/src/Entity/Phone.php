@@ -19,21 +19,19 @@ class Phone
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"list", "show"})
      */
     private $id;
 
     /**
      * @ORM\Column(name="name", type="string", length=255)
-     * @Groups({"list", "show"})
      * @Assert\NotBlank(message="Le champ ne doit pas être vide")
      * @Assert\Length(min="2", minMessage="Ce champ doit contenir un minimum de {{ limit }} caractères", max="255", maxMessage="Ce champ doit contenir un maximum de {{ limit }} caractères")
      */
     private $name;
 
     /**
+     * @Groups("phone_test")
      * @ORM\Column(type="string", length=255)
-     * @Groups("show")
      * @Assert\NotBlank(message="Le champ ne doit pas être vide")
      */
     private $description;
@@ -41,7 +39,6 @@ class Phone
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"list", "show"})
      * @Assert\Range(min="0", max="1500")
      * @Assert\NotBlank(message="Ce champ ne doit pas être vide")
      * @Assert\Range(min="0", minMessage="La valeur minimum autorisée est {{ limit }}", max="1500", maxMessage="La valeur maximum autorisée est {{ limit }}")
@@ -50,14 +47,12 @@ class Phone
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups("show")
      * @Assert\NotBlank
      */
     private $color;
 
     /**
      * @ORM\Column(type="datetime")
-     * @Groups("show")
      */
     private $releasedAt;
 
