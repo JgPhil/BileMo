@@ -31,7 +31,6 @@ class PhoneController extends AbstractController
     private $serializer;
 
 
-
     public function __construct()
     {
         $this->encoder = new JsonEncoder();
@@ -45,7 +44,7 @@ class PhoneController extends AbstractController
     public function show($id, PhoneRepository $phoneRepository)
     {
         $phone = $phoneRepository->find($id);
-        return $this->json($phone, 200, [], ['groups' => 'show']);
+        return $this->json($phone, 200);
     }
 
     /**
@@ -57,7 +56,7 @@ class PhoneController extends AbstractController
         if (is_null($page) || $page < 1) {
             $page = 1;
         }
-        return $this->json($phoneRepository->findAllPhones($page, $this->getParameter('limit')), 200, [], ['groups' => 'list']);
+        return $this->json($phoneRepository->findAllPhones($page, $this->getParameter('limit')), 200);
     }
 
     /**
@@ -69,14 +68,13 @@ class PhoneController extends AbstractController
         $errors = $validator->validate($phone);
         if (count($errors)) {
             $errors = $this->serializer->serialize($errors, 'json');
-            return new Response($errors, 500, [
+            return new Response($errors, 400, [
                 'Content-Type' => 'application/json'
             ]);
         }
         $entityManager->persist($phone);
         $entityManager->flush();
         $data = [
-            'status' => 201,
             'message' => 'Le téléphone a bien été ajouté'
         ];
         return $this->json($data, 201);
@@ -92,27 +90,23 @@ class PhoneController extends AbstractController
         $data = json_decode($request->getContent());
         //Setters Construction
         foreach ($data as $key => $value) {
-            if ($key && !empty($value)) {
-                if (preg_match('/_/', $key)) {
-                    $value = new DateTime($value);
-                    $key = str_replace("_", "", $key);
-                    $key = str_replace(strrchr($key, "a"), "At", $key);
-                }
-                $name = ucfirst($key);
-                $setter = 'set' . $name;
-                $phoneUpdate->$setter($value);
+            if ($key === "released_at") {
+                $value = new DateTime($value);
+                $key = "ReleasedAt";
             }
+            $name = ucfirst($key);
+            $setter = 'set' . $name;
+            $phoneUpdate->$setter($value);
         }
         $errors = $validator->validate($phoneUpdate);
         if (count($errors)) {
             $errors = $this->serializer->serialize($errors, 'json');
-            return new Response($errors, 500, [
+            return new Response($errors, 400, [
                 'Content-Type' => 'application/json'
             ]);
         }
         $entityManager->flush();
         $data = [
-            'status' => 200,
             'message' => 'Le téléphone a bien été mis à jour'
         ];
         return new JsonResponse($data);

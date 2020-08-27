@@ -30,7 +30,7 @@ class Customer
     private $email;
 
     /**
-     * @ORM\OneToMany(targetEntity=User::class, mappedBy="client", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=User::class, mappedBy="customer", orphanRemoval=true)
      */
     private $users;
 
@@ -80,7 +80,7 @@ class Customer
     {
         if (!$this->users->contains($user)) {
             $this->users[] = $user;
-            $user->setClient($this);
+            $user->setCustomer($this);
         }
 
         return $this;
@@ -91,8 +91,8 @@ class Customer
         if ($this->users->contains($user)) {
             $this->users->removeElement($user);
             // set the owning side to null (unless already changed)
-            if ($user->getClient() === $this) {
-                $user->setClient(null);
+            if ($user->getCustomer() === $this) {
+                $user->setCustomer(null);
             }
         }
 
