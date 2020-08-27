@@ -3,16 +3,14 @@
 namespace App\Controller;
 
 use DateTime;
-use App\Entity\Phone;
-use App\Repository\PhoneRepository;
+use App\Entity\User;
+use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping\Annotation;
-use App\Repository\CustomerRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -26,7 +24,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 /**
  * @Route("/api")
  */
-class PhoneController extends AbstractController
+class UserController extends AbstractController
 {
     private $encoder;
     private $normalizer;
@@ -41,68 +39,68 @@ class PhoneController extends AbstractController
     }
 
     /**
-     * @Route("/phones/{id}", name="show_phone", methods={"GET"})
+     * @Route("/users/{id}", name="show_user", methods={"GET"})
      */
-    public function show($id, PhoneRepository $phoneRepository)
+    public function show($id, UserRepository $userRepository)
     {
-        $phone = $phoneRepository->find($id);
-        return $this->json($phone, 200);
+        $user = $userRepository->find($id);
+        return $this->json($user, 200, [], ['groups' => 'user_read']);
     }
 
     /**
-     * @Route("/phones/{page<\d+>?1}", name="list_phone", methods={"GET"})
+     * @Route("/users/{page<\d+>?1}", name="list_user", methods={"GET"})
      */
-    public function index(Request $request, PhoneRepository $phoneRepository)
+    public function index(Request $request, UserRepository $userRepository)
     {
         $page = $request->query->get('page');
         if (is_null($page) || $page < 1) {
             $page = 1;
         }
-        return $this->json($phoneRepository->findAllPhones($page, $this->getParameter('limit')), 200);
+        return $this->json($userRepository->findAllUsers($page, $this->getParameter('limit')), 200, [], ['groups' => 'user_read']);
     }
 
     /**
-     * @Route("/phones", name="add_phone", methods={"POST"})
+     * @Route("/users", name="add_user", methods={"POST"})
      */
     public function new(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator)
     {
-        $phone = $this->serializer->deserialize($request->getContent(), Phone::class, 'json');
-        $errors = $validator->validate($phone);
+        $user = $this->serializer->deserialize($request->getContent(), User::class, 'json');
+        $errors = $validator->validate($user);
         if (count($errors)) {
             $errors = $this->serializer->serialize($errors, 'json');
             return new Response($errors, 400, [
                 'Content-Type' => 'application/json'
             ]);
         }
-        $entityManager->persist($phone);
+        $entityManager->persist($user);
         $entityManager->flush();
         $data = [
-            'message' => 'Le téléphone a bien été ajouté'
+            'message' => 'L\'utilisateur a bien été ajouté'
         ];
         return $this->json($data, 201);
     }
 
 
     /**
-     * @Route("/phones/{id}", name="update_phone", methods={"PUT"})
+     * @Route("/users/{id}", name="update_user", methods={"PUT"})
      */
-    public function update(Request $request, Phone $phone, ValidatorInterface $validator, EntityManagerInterface $entityManager)
+    public function update(Request $request, User $user, ValidatorInterface $validator, EntityManagerInterface $entityManager)
     {
-        $phoneUpdate = $entityManager->getRepository(Phone::class)->find($phone->getId());
+        $userUpdate = $entityManager->getRepository(User::class)->find($user->getId());
         $data = json_decode($request->getContent());
         //Setters Construction
         foreach ($data as $key => $value) {
             if ($key !== "id") {
-                if ($key === "released_at") {
+                if ($key === "createdAt") {
                     $value = new DateTime($value);
-                    $key = "ReleasedAt";
+                    $key = "createdAt";
                 }
                 $name = ucfirst($key);
                 $setter = 'set' . $name;
-                $phoneUpdate->$setter($value);
+                $userUpdate->$setter($value);
             }
         }
-        $errors = $validator->validate($phoneUpdate);
+        $errors = $validator->validate($userUpdate);
         if (count($errors)) {
             $errors = $this->serializer->serialize($errors, 'json');
             return new Response($errors, 400, [
@@ -111,18 +109,18 @@ class PhoneController extends AbstractController
         }
         $entityManager->flush();
         $data = [
-            'message' => 'Le téléphone a bien été mis à jour'
+            'message' => 'L\'utilisateur a bien été mis à jour'
         ];
         return new JsonResponse($data);
     }
 
 
     /**
-     * @Route("/phones/{id}", name="delete_phone", methods={"DELETE"})
+     * @Route("/users/{id}", name="delete_user", methods={"DELETE"})
      */
-    public function delete(Phone $phone, EntityManagerInterface $entityManager)
+    public function delete(User $user, EntityManagerInterface $entityManager)
     {
-        $entityManager->remove($phone);
+        $entityManager->remove($user);
         $entityManager->flush();
         return new Response(null, 204);
     }
