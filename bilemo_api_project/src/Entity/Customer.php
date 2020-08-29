@@ -41,7 +41,6 @@ class Customer
 
     /**
      * @ORM\OneToMany(targetEntity=User::class, mappedBy="customer", orphanRemoval=true)
-     * @Groups({"customer_read"})
      */
     private $users;
 

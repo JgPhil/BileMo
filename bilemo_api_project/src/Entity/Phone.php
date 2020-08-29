@@ -122,7 +122,7 @@ class Phone
         return $this->releasedAt;
     }
 
-    public function setReleasedAt(\DateTimeInterface $releasedAt): self
+    public function setReleasedAt($releasedAt): self
     {
         $this->releasedAt = $releasedAt;
 

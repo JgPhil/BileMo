@@ -5,6 +5,7 @@ namespace App\Entity;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
+use DateTimeInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -49,7 +50,7 @@ class User
     private $createdAt;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Customer::class, inversedBy="users")
+     * @ORM\ManyToOne(targetEntity=Customer::class, inversedBy="users", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $customer;
@@ -57,7 +58,6 @@ class User
     public function __construct()
     {
         $this->createdAt = new DateTime();
-        $this->customer = new Customer();
     }
 
     public function getId(): ?int
@@ -106,7 +106,7 @@ class User
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function setCreatedAt($createdAt): self
     {
         $this->createdAt = $createdAt;
 

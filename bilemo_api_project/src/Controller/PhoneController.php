@@ -28,9 +28,10 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
  */
 class PhoneController extends AbstractController
 {
-    private $encoder;
-    private $normalizer;
-    private $serializer;
+/* 
+    protected $encoder;
+    protected $normalizer;
+    protected $serializer;
 
 
     public function __construct()
@@ -39,6 +40,8 @@ class PhoneController extends AbstractController
         $this->normalizer = new GetSetMethodNormalizer(null, null, null, null, null, $this->getDefaultContext());
         $this->serializer = new Serializer([$this->normalizer], [$this->encoder]);
     }
+ */
+
 
     /**
      * @Route("/phones/{id}", name="show_phone", methods={"GET"})
@@ -64,12 +67,12 @@ class PhoneController extends AbstractController
     /**
      * @Route("/phones", name="add_phone", methods={"POST"})
      */
-    public function new(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator)
+    public function new(Request $request, EntityManagerInterface $entityManager,SerializerInterface $serializer, ValidatorInterface $validator)
     {
-        $phone = $this->serializer->deserialize($request->getContent(), Phone::class, 'json');
+        $phone = $serializer->deserialize($request->getContent(), Phone::class, 'json');
         $errors = $validator->validate($phone);
         if (count($errors)) {
-            $errors = $this->serializer->serialize($errors, 'json');
+            $errors = $serializer->serialize($errors, 'json');
             return new Response($errors, 400, [
                 'Content-Type' => 'application/json'
             ]);
@@ -86,14 +89,14 @@ class PhoneController extends AbstractController
     /**
      * @Route("/phones/{id}", name="update_phone", methods={"PUT"})
      */
-    public function update(Request $request, Phone $phone, ValidatorInterface $validator, EntityManagerInterface $entityManager)
+    public function update(Request $request, Phone $phone, ValidatorInterface $validator,SerializerInterface $serializer, EntityManagerInterface $entityManager)
     {
         $phoneUpdate = $entityManager->getRepository(Phone::class)->find($phone->getId());
         $data = json_decode($request->getContent());
         //Setters Construction
         foreach ($data as $key => $value) {
             if ($key !== "id") {
-                if ($key === "released_at") {
+                if ($key === "releasedAt") {
                     $value = new DateTime($value);
                     $key = "ReleasedAt";
                 }
@@ -104,7 +107,7 @@ class PhoneController extends AbstractController
         }
         $errors = $validator->validate($phoneUpdate);
         if (count($errors)) {
-            $errors = $this->serializer->serialize($errors, 'json');
+            $errors = $serializer->serialize($errors, 'json');
             return new Response($errors, 400, [
                 'Content-Type' => 'application/json'
             ]);

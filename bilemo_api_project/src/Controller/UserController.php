@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Customer;
 use DateTime;
 use App\Entity\User;
+use App\Repository\CustomerRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping\Annotation;
 use Doctrine\ORM\EntityManagerInterface;
@@ -26,9 +28,10 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
  */
 class UserController extends AbstractController
 {
-    private $encoder;
-    private $normalizer;
-    private $serializer;
+
+    protected $encoder;
+    protected $normalizer;
+    protected $serializer;
 
 
     public function __construct()
@@ -37,6 +40,8 @@ class UserController extends AbstractController
         $this->normalizer = new GetSetMethodNormalizer(null, null, null, null, null, $this->getDefaultContext());
         $this->serializer = new Serializer([$this->normalizer], [$this->encoder]);
     }
+
+
 
     /**
      * @Route("/users/{id}", name="show_user", methods={"GET"})
@@ -62,17 +67,21 @@ class UserController extends AbstractController
     /**
      * @Route("/users", name="add_user", methods={"POST"})
      */
-    public function new(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator)
+    public function new(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator, CustomerRepository $customerRepository)
     {
-        $user = $this->serializer->deserialize($request->getContent(), User::class, 'json');
-        $errors = $validator->validate($user);
+        $data = $request->getContent();
+        $user = $serializer->deserialize($data, User::class, 'json', ['groups' => 'user_read']);
+        $customer = $customerRepository->find(1);
+
+        $errors = $validator->validate($user, [], ['groups' => 'user_read']);
         if (count($errors)) {
-            $errors = $this->serializer->serialize($errors, 'json');
+            $errors = $serializer->serialize($errors, 'json');
             return new Response($errors, 400, [
                 'Content-Type' => 'application/json'
             ]);
         }
         $entityManager->persist($user);
+        $customer->addUser($user);
         $entityManager->flush();
         $data = [
             'message' => 'L\'utilisateur a bien été ajouté'
@@ -84,7 +93,7 @@ class UserController extends AbstractController
     /**
      * @Route("/users/{id}", name="update_user", methods={"PUT"})
      */
-    public function update(Request $request, User $user, ValidatorInterface $validator, EntityManagerInterface $entityManager)
+    public function update(Request $request, User $user,SerializerInterface $serializer, ValidatorInterface $validator, EntityManagerInterface $entityManager)
     {
         $userUpdate = $entityManager->getRepository(User::class)->find($user->getId());
         $data = json_decode($request->getContent());
@@ -102,7 +111,7 @@ class UserController extends AbstractController
         }
         $errors = $validator->validate($userUpdate);
         if (count($errors)) {
-            $errors = $this->serializer->serialize($errors, 'json');
+            $errors = $serializer->serialize($errors, 'json');
             return new Response($errors, 400, [
                 'Content-Type' => 'application/json'
             ]);
