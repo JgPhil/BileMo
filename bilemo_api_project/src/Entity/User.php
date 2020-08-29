@@ -48,9 +48,16 @@ class User
      */
     private $createdAt;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Customer::class, inversedBy="users")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $customer;
+
     public function __construct()
     {
         $this->createdAt = new DateTime();
+        $this->customer = new Customer();
     }
 
     public function getId(): ?int
@@ -102,6 +109,18 @@ class User
     public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getCustomer(): ?Customer
+    {
+        return $this->customer;
+    }
+
+    public function setCustomer(?Customer $customer): self
+    {
+        $this->customer = $customer;
 
         return $this;
     }
