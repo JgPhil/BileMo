@@ -16,9 +16,11 @@ class AppFixtures extends Fixture
         $faker = Faker\Factory::create('fr-FR');
 
         $customer = new Customer();
-        $customer->setName('phone-discount.fr')
+        $customer->setUsername('phone-discount.fr')
+            ->setPassword(password_hash('password', PASSWORD_BCRYPT))
             ->setEmail('admin@phone-discount.fr')
-            ->setCreatedAt(new DateTime('now'));
+            ->setCreatedAt(new DateTime('now'))
+            ->setRoles(['ROLE_USER']);
         $manager->persist($customer);
 
         for ($i = 0; $i < 20; $i++) {
