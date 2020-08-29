@@ -34,8 +34,14 @@ class Customer
     private $email;
 
     /**
-     * @Groups("customer_read")
+     * @ORM\Column(type="datetime")
+     * @Groups({"user_read", "customer_read"})
+     */
+    private $createdAt;
+
+    /**
      * @ORM\OneToMany(targetEntity=User::class, mappedBy="customer", orphanRemoval=true)
+     * @Groups({"customer_read"})
      */
     private $users;
 
@@ -43,6 +49,7 @@ class Customer
     {
         $this->users = new ArrayCollection();
     }
+
 
     public function getId(): ?int
     {
@@ -73,6 +80,19 @@ class Customer
         return $this;
     }
 
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
     /**
      * @return Collection|User[]
      */
@@ -85,6 +105,7 @@ class Customer
     {
         if (!$this->users->contains($user)) {
             $this->users[] = $user;
+            $user->setCustomer($this);
         }
 
         return $this;
@@ -94,6 +115,10 @@ class Customer
     {
         if ($this->users->contains($user)) {
             $this->users->removeElement($user);
+            // set the owning side to null (unless already changed)
+            if ($user->getCustomer() === $this) {
+                $user->setCustomer(null);
+            }
         }
 
         return $this;

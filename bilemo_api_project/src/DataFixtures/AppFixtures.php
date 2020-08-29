@@ -4,6 +4,7 @@ namespace App\DataFixtures;
 
 use App\Entity\Customer;
 use App\Entity\User;
+use DateTime;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker;
@@ -16,7 +17,8 @@ class AppFixtures extends Fixture
 
         $customer = new Customer();
         $customer->setName('phone-discount.fr')
-            ->setEmail('admin@phone-discount.fr');
+            ->setEmail('admin@phone-discount.fr')
+            ->setCreatedAt(new DateTime('now'));
         $manager->persist($customer);
 
         for ($i = 0; $i < 20; $i++) {
@@ -29,6 +31,7 @@ class AppFixtures extends Fixture
                 ->setCustomer($customer);
 
             $manager->persist($user);
+            $customer->addUser($user);
         }
 
         $manager->flush();
