@@ -49,7 +49,16 @@ class UserController extends AbstractController
     public function show($id, UserRepository $userRepository)
     {
         $user = $userRepository->find($id);
-        return $this->json($user, 200, [], ['groups' => 'user_read']);
+        if (!is_null($user)) {
+            if ($user->getCustomer() === $this->getUser()) {
+                return $this->json($user, 200, [], ['groups' => 'user_read']);
+            } else {
+                $data = "Access denied";
+                return $this->json($data, 403);
+            }
+        }
+        $data = "Ressource not found";
+        return $this->json($data, 404);
     }
 
     /**
@@ -61,7 +70,7 @@ class UserController extends AbstractController
         if (is_null($page) || $page < 1) {
             $page = 1;
         }
-        return $this->json($userRepository->findAllUsers($page, $this->getParameter('limit')), 200, [], ['groups' => 'user_read']);
+        return $this->json($userRepository->findAllCustomerUsers($this->getUser(), $page, $this->getParameter('limit')), 200, [], ['groups' => 'user_read']);
     }
 
     /**
@@ -93,34 +102,39 @@ class UserController extends AbstractController
     /**
      * @Route("/users/{id}", name="update_user", methods={"PUT"})
      */
-    public function update(Request $request, User $user,SerializerInterface $serializer, ValidatorInterface $validator, EntityManagerInterface $entityManager)
+    public function update(Request $request, User $user, SerializerInterface $serializer, ValidatorInterface $validator, EntityManagerInterface $entityManager)
     {
-        $userUpdate = $entityManager->getRepository(User::class)->find($user->getId());
-        $data = json_decode($request->getContent());
-        //Setters Construction
-        foreach ($data as $key => $value) {
-            if ($key !== "id") {
-                if ($key === "createdAt") {
-                    $value = new DateTime($value);
-                    $key = "createdAt";
+        if ($user->getCustomer() === $this->getUser()) {
+            $data = json_decode($request->getContent());
+            foreach ($data as $key => $value) {
+                if ($key !== "id") {
+                    if ($key === "createdAt") {
+                        $value = new DateTime($value);
+                        $key = "createdAt";
+                    }
+                    $name = ucfirst($key);
+                    $setter = 'set' . $name;
+                    $user->$setter($value);
                 }
-                $name = ucfirst($key);
-                $setter = 'set' . $name;
-                $userUpdate->$setter($value);
             }
+            $errors = $validator->validate($user);
+            if (count($errors)) {
+                $errors = $serializer->serialize($errors, 'json');
+                return new Response($errors, 400, [
+                    'Content-Type' => 'application/json'
+                ]);
+            }
+            $entityManager->flush();
+            $data = [
+                'message' => 'L\'utilisateur a bien été mis à jour'
+            ];
+            return new JsonResponse($data);
+        } else {
+            $data = [
+                'message' => 'Access denied'
+            ];
+            return $this->json($data, 403);
         }
-        $errors = $validator->validate($userUpdate);
-        if (count($errors)) {
-            $errors = $serializer->serialize($errors, 'json');
-            return new Response($errors, 400, [
-                'Content-Type' => 'application/json'
-            ]);
-        }
-        $entityManager->flush();
-        $data = [
-            'message' => 'L\'utilisateur a bien été mis à jour'
-        ];
-        return new JsonResponse($data);
     }
 
 
@@ -129,8 +143,15 @@ class UserController extends AbstractController
      */
     public function delete(User $user, EntityManagerInterface $entityManager)
     {
-        $entityManager->remove($user);
-        $entityManager->flush();
-        return new Response(null, 204);
+        if ($user->getCustomer() === $this->getUser()) {
+            $entityManager->remove($user);
+            $entityManager->flush();
+            return new Response(null, 204);
+        } else {
+            $data = [
+                'message' => 'Access denied'
+            ];
+            return $this->json($data, 403);
+        }
     }
 }
