@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Customer;
 use App\Entity\User;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -21,18 +22,19 @@ class UserRepository extends ServiceEntityRepository
     }
 
 
-    public function findAllUsers($page, $limit)
+    public function findAllCustomerUsers(Customer $customer, $page, $limit)
     {
 
         $query = $this->createQueryBuilder('p')
-            ->getQuery()
+            ->where('p.customer = :customer')
+            ->setParameter('customer', $customer)
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit);
 
-            return new Paginator($query);
+        return new Paginator($query);
     }
 
-    
+
     // /**
     //  * @return User[] Returns an array of User objects
     //  */
