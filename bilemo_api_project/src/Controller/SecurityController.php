@@ -16,7 +16,8 @@ class SecurityController extends AbstractController
     /**
      * @Route("/login", name="login", methods={"POST"})
      */
-    public function login(){
-
+    public function login()
+    {
     }
-}
+
+
