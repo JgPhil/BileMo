@@ -4,7 +4,7 @@ info:
   version: '0.1'
 servers:
   -
-    url: 'http://localhost/api/v1'
+    url: 'http://API_HOST/api/v1'
     description: 'Api BileMo'
 paths:
   '/users/{id}':

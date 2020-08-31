@@ -47,19 +47,16 @@ class UserController extends AbstractController
 
     /**
      * @OA\Get(
-     *     path="/users/{id}",
-     *          @OA\Parameter(
-     *              name="id",
-     *              in="path",
-     *              description="Ressource ID",
-     *              required=true,
-     *              @OA\Schema(type="integer")
-     *          ),
-     *     @OA\Response(
+     *      path="/users/{id}",
+     *      tags={"Users"},
+     *          @OA\Parameter(ref="#/components/parameters/id"),
+     *      @OA\Response(
      *         response="200",
-     *         description="A user",
+     *         description="Show a user",
      *         @OA\JsonContent(ref="#/components/schemas/User"),
-     *      ) 
+     *      ),
+     *      @OA\Response(response="403",ref="#/components/responses/Unauthorized"),
+     *      @OA\Response(response="404",ref="#/components/responses/NotFound")
      * ) 
      * 
      * @Route("/users/{id}", name="show_user", methods={"GET"})
@@ -82,6 +79,7 @@ class UserController extends AbstractController
     /**
      * @OA\Get(
      *      path="/users",
+     *      tags={"Users"},
      *      @OA\Parameter(
      *          name="page",
      *          in="query",
@@ -107,6 +105,17 @@ class UserController extends AbstractController
     }
 
     /**
+     * @OA\Post(
+     *      path="/users",
+     *      tags={"Users"},
+     *      @OA\Response(
+     *          response="201",
+     *          description="New user created",
+     *          @OA\JsonContent(@OA\Property(property="message", type="string", example="New user created"))
+     *       ),
+     *      @OA\Response(response="400",ref="#/components/responses/BadRequest")
+     * )
+     * 
      * @Route("/users", name="add_user", methods={"POST"})
      */
     public function new(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator, CustomerRepository $customerRepository)
@@ -133,6 +142,24 @@ class UserController extends AbstractController
 
 
     /**
+    * @OA\Put(
+     *      path="/users",
+     *      tags={"Users"},
+     *      @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          description="Ressource ID",
+     *          required=true,
+     *          @OA\Schema(type="integer")
+     *          ),
+     *      @OA\Response(
+     *          response="200",
+     *          description="User Update",
+     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/User"))
+     *      ),
+     *      @OA\Response(response="403",ref="#/components/responses/Unauthorized"),
+     *      @OA\Response(response="400",ref="#/components/responses/BadRequest")
+     * )
      * @Route("/users/{id}", name="update_user", methods={"PUT"})
      */
     public function update(Request $request, User $user, SerializerInterface $serializer, ValidatorInterface $validator, EntityManagerInterface $entityManager)
