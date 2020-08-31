@@ -9,14 +9,18 @@ use DateTimeInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use OpenApi\Annotations as OA;
 
 /**
+ * @OA\Schema()
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @UniqueEntity("email")
  */
 class User
 {
     /**
+     * @var int
+     * @OA\Property(type="integer")
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
@@ -26,30 +30,40 @@ class User
 
 
     /**
+     * @var string
+     * @OA\Property(type="string")
      * @ORM\Column(type="string", length=255)
      * @Groups({"user_read", "customer_read"})
      */
     private $firstName;
 
     /**
+     * @var string
+     * @OA\Property(type="string")
      * @ORM\Column(type="string", length=255)
      * @Groups({"user_read", "customer_read"})
      */
     private $lastName;
 
     /**
+     * @var string
+     * @OA\Property(type="string")
      * @ORM\Column(type="string", length=255)
      * @Groups({"user_read", "customer_read"})
      */
     private $email;
 
     /**
+     * @var \DateTimeInterface
+     * @OA\Property(type="string", format="date-time")
      * @ORM\Column(type="datetime")
      * @Groups({"user_read", "customer_read"})
      */
     private $createdAt;
 
     /**
+     * @OA\Property(type="object")
+     * @var Customer
      * @ORM\ManyToOne(targetEntity=Customer::class, inversedBy="users", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */

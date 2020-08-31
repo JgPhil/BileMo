@@ -20,10 +20,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use OpenApi\Annotations as OA;
 
 
 
 /**
+ * 
  * @Route("/api")
  */
 class UserController extends AbstractController
@@ -44,6 +46,22 @@ class UserController extends AbstractController
 
 
     /**
+     * @OA\Get(
+     *     path="/users/{id}",
+     *          @OA\Parameter(
+     *              name="id",
+     *              in="path",
+     *              description="Ressource ID",
+     *              required=true,
+     *              @OA\Schema(type="integer")
+     *          ),
+     *     @OA\Response(
+     *         response="200",
+     *         description="A user",
+     *         @OA\JsonContent(ref="#/components/schemas/User"),
+     *      ) 
+     * ) 
+     * 
      * @Route("/users/{id}", name="show_user", methods={"GET"})
      */
     public function show($id, UserRepository $userRepository)
@@ -62,6 +80,21 @@ class UserController extends AbstractController
     }
 
     /**
+     * @OA\Get(
+     *      path="/users",
+     *      @OA\Parameter(
+     *          name="page",
+     *          in="query",
+     *          description="the current page",
+     *          required=false,
+     *          @OA\Schema(type="integer")
+     *          ),
+     *      @OA\Response(
+     *          response="200",
+     *          description="List of users",
+     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/User"))
+     *      )
+     * )
      * @Route("/users/{page<\d+>?1}", name="list_user", methods={"GET"})
      */
     public function index(Request $request, UserRepository $userRepository)
