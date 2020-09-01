@@ -20,11 +20,13 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use OpenApi\Annotations as OA;
 
 
 
 /**
- * @Route("/api")
+ * 
+ * @Route("/api/v1")
  */
 class UserController extends AbstractController
 {
@@ -44,6 +46,20 @@ class UserController extends AbstractController
 
 
     /**
+     * @OA\Get(
+     *      path="/users/{id}",
+     *      security={"bearer"},
+     *      tags={"Users"},
+     *          @OA\Parameter(ref="#/components/parameters/id"),
+     *      @OA\Response(
+     *         response="200",
+     *         description="Show a user ressource",
+     *         @OA\JsonContent(ref="#/components/schemas/User"),
+     *      ),
+     *      @OA\Response(response="403",ref="#/components/responses/Unauthorized"),
+     *      @OA\Response(response="404",ref="#/components/responses/NotFound"), 
+     * ) 
+     * 
      * @Route("/users/{id}", name="show_user", methods={"GET"})
      */
     public function show($id, UserRepository $userRepository)
@@ -62,6 +78,17 @@ class UserController extends AbstractController
     }
 
     /**
+     * @OA\Get(
+     *      path="/users",
+     *      security={"bearer"},
+     *      tags={"Users"},
+     *      @OA\Parameter(ref="#/components/parameters/page"),
+     *      @OA\Response(
+     *          response="200",
+     *          description="List of users ressources",
+     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/User"))
+     *      )
+     * )
      * @Route("/users/{page<\d+>?1}", name="list_user", methods={"GET"})
      */
     public function index(Request $request, UserRepository $userRepository)
@@ -74,6 +101,18 @@ class UserController extends AbstractController
     }
 
     /**
+     * @OA\Post(
+     *      path="/users",
+     *      security={"bearer"},
+     *      tags={"Users"},
+     *      @OA\Response(
+     *          response="201",
+     *          description="New user ressource created",
+     *          @OA\JsonContent(@OA\Property(property="message", type="string", example="New user ressource created"))
+     *       ),
+     *      @OA\Response(response="400",ref="#/components/responses/BadRequest")
+     * )
+     * 
      * @Route("/users", name="add_user", methods={"POST"})
      */
     public function new(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator, CustomerRepository $customerRepository)
@@ -100,6 +139,20 @@ class UserController extends AbstractController
 
 
     /**
+     * @OA\Put(
+     *      path="/users/{id}",
+     *      security={"bearer"},
+     *      tags={"Users"},
+     *      @OA\Parameter(ref="#/components/parameters/id"),
+     *      @OA\Response(
+     *          response="200",
+     *          description="User Update",
+     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/User"))
+     *      ),
+     *      @OA\Response(response="403",ref="#/components/responses/Unauthorized"),
+     *      @OA\Response(response="400",ref="#/components/responses/BadRequest")
+     * )
+     * 
      * @Route("/users/{id}", name="update_user", methods={"PUT"})
      */
     public function update(Request $request, User $user, SerializerInterface $serializer, ValidatorInterface $validator, EntityManagerInterface $entityManager)
@@ -139,6 +192,18 @@ class UserController extends AbstractController
 
 
     /**
+     * @OA\Delete(
+     *      path="/users/{id}",
+     *      security={"bearer"},
+     *      tags={"Users"},
+     *      @OA\Parameter(ref="#/components/parameters/id"),
+     *      @OA\Response(
+     *          response="204",
+     *          description="Delete a User"
+     *      ),
+     *      @OA\Response(response="403",ref="#/components/responses/Unauthorized")
+     * )
+     * 
      * @Route("/users/{id}", name="delete_user", methods={"DELETE"})
      */
     public function delete(User $user, EntityManagerInterface $entityManager)

@@ -12,9 +12,10 @@ class ExceptionSubscriber implements EventSubscriberInterface
 {
     public function onKernelException(ExceptionEvent $event)
     {
-        $exception = $event->getThrowable();
-        $response = new JsonResponse();
 
+        $response = new JsonResponse();
+        /* 
+        $exception = $event->getThrowable();
         if ($exception instanceof HttpExceptionInterface) {
             $data = [
                 'message' => $exception->getMessage()
@@ -28,7 +29,12 @@ class ExceptionSubscriber implements EventSubscriberInterface
             $response->setData([
                 'message' => $exception->getMessage()
             ]);
-        }
+        } */
+        $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+        $response->setJson("");
+        $response->setData([
+            'message' => "Bad Request"
+        ]);
         $event->setResponse($response);
     }
 

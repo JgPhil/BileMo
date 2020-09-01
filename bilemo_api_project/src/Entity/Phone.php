@@ -8,14 +8,18 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use OpenApi\Annotations as OA;
 
 /**
+ * @OA\Schema()
  * @ORM\Entity(repositoryClass=PhoneRepository::class)
  * @UniqueEntity("name")
  */
 class Phone
 {
     /**
+     * @var int
+     * @OA\Property(type="integer")
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
@@ -23,6 +27,8 @@ class Phone
     private $id;
 
     /**
+     * @var string
+     * @OA\Property(type="string")
      * @ORM\Column(name="name", type="string", length=255)
      * @Assert\NotBlank(message="Le champ ne doit pas être vide")
      * @Assert\Length(min="2", minMessage="Ce champ doit contenir un minimum de {{ limit }} caractères", max="255", maxMessage="Ce champ doit contenir un maximum de {{ limit }} caractères")
@@ -30,6 +36,8 @@ class Phone
     private $name;
 
     /**
+     * @var string
+     * @OA\Property(type="string")
      * @Groups("phone_test")
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank(message="Le champ ne doit pas être vide")
@@ -38,6 +46,8 @@ class Phone
 
 
     /**
+     * @var int
+     * @OA\Property(type="integer")
      * @ORM\Column(type="string", length=255)
      * @Assert\Range(min="0", max="1500")
      * @Assert\NotBlank(message="Ce champ ne doit pas être vide")
@@ -46,12 +56,16 @@ class Phone
     private $price;
 
     /**
+     * @var string
+     * @OA\Property(type="string")
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank
      */
     private $color;
 
     /**
+     * @var \DateTimeInterface
+     * @OA\Property(type="string", format="date-time")
      * @ORM\Column(type="datetime")
      */
     private $releasedAt;

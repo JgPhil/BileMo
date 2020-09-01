@@ -8,13 +8,17 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
+use OpenApi\Annotations as OA;
 
 /**
+ * @OA\Schema()
  * @ORM\Entity(repositoryClass=CustomerRepository::class)
  */
 class Customer implements UserInterface
 {
     /**
+     * @var int
+     * @OA\Property(type="integer")
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
@@ -23,24 +27,32 @@ class Customer implements UserInterface
     private $id;
 
     /**
+     * @var string
+     * @OA\Property(type="string")
      * @ORM\Column(type="string", length=255)
      * @Groups({"user_read", "customer_read"})
      */
     private $username;
 
     /**
+     * @var string
+     * @OA\Property(type="string")
      * @ORM\Column(type="string", length=255)
      * @Groups({"user_read", "customer_read"})
      */
     private $email;
 
     /**
+     * @var \DateTimeInterface
+     * @OA\Property(type="string", format="date-time")
      * @ORM\Column(type="datetime")
      * @Groups({"user_read", "customer_read"})
      */
     private $createdAt;
 
     /**
+     * @OA\Property(type="object")
+     * @var ArrayCollection
      * @ORM\OneToMany(targetEntity=User::class, mappedBy="customer", orphanRemoval=true)
      */
     private $users;

@@ -20,15 +20,16 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use OpenApi\Annotations as OA;
 
 
 
 /**
- * @Route("/api")
+ * @Route("/api/v1")
  */
 class PhoneController extends AbstractController
 {
-/* 
+    /* 
     protected $encoder;
     protected $normalizer;
     protected $serializer;
@@ -44,15 +45,43 @@ class PhoneController extends AbstractController
 
 
     /**
+     * @OA\Get(
+     *      path="/phones/{id}",
+     *      security={"bearer"},
+     *      tags={"Phones"},
+     *          @OA\Parameter(ref="#/components/parameters/id"),
+     *      @OA\Response(
+     *         response="200",
+     *         description="Shows a Phone",
+     *         @OA\JsonContent(ref="#/components/schemas/Phone"),
+     *      ),
+     *      @OA\Response(response="404",ref="#/components/responses/NotFound")
+     * )
+     * 
      * @Route("/phones/{id}", name="show_phone", methods={"GET"})
      */
     public function show($id, PhoneRepository $phoneRepository)
     {
         $phone = $phoneRepository->find($id);
-        return $this->json($phone, 200);
+        if (!is_null($phone)) {
+            return $this->json($phone, 200);
+        }
+        $data = "Ressource not found";
+        return $this->json($data, 404);
     }
 
     /**
+     * @OA\Get(
+     *      path="/phones",
+     *      security={"bearer"},
+     *      tags={"Phones"},
+     *      @OA\Parameter(ref="#/components/parameters/page"),
+     *      @OA\Response(
+     *          response="200",
+     *          description="List of phones",
+     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Phone"))
+     *      )
+     * )
      * @Route("/phones/{page<\d+>?1}", name="list_phone", methods={"GET"})
      */
     public function index(Request $request, PhoneRepository $phoneRepository)
@@ -65,9 +94,21 @@ class PhoneController extends AbstractController
     }
 
     /**
+     * @OA\Post(
+     *      path="/phones",
+     *      security={"bearer"},
+     *      tags={"Phones"},
+     *      @OA\Response(
+     *          response="201",
+     *          description="New phone ressource created",
+     *          @OA\JsonContent(@OA\Property(property="message", type="string", example="New phone ressource created"))
+     *       ),
+     *      @OA\Response(response="400",ref="#/components/responses/BadRequest")
+     * )
+     * 
      * @Route("/phones", name="add_phone", methods={"POST"})
      */
-    public function new(Request $request, EntityManagerInterface $entityManager,SerializerInterface $serializer, ValidatorInterface $validator)
+    public function new(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator)
     {
         $phone = $serializer->deserialize($request->getContent(), Phone::class, 'json');
         $errors = $validator->validate($phone);
@@ -87,9 +128,22 @@ class PhoneController extends AbstractController
 
 
     /**
+     * @OA\Put(
+     *      path="/phones/{id}",
+     *      security={"bearer"},
+     *      tags={"Phones"},
+     *      @OA\Parameter(ref="#/components/parameters/id"),
+     *      @OA\Response(
+     *          response="200",
+     *          description="Phone Update",
+     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Phone"))
+     *      ),
+     *      @OA\Response(response="400",ref="#/components/responses/BadRequest")
+     * )
+     * 
      * @Route("/phones/{id}", name="update_phone", methods={"PUT"})
      */
-    public function update(Request $request, Phone $phone, ValidatorInterface $validator,SerializerInterface $serializer, EntityManagerInterface $entityManager)
+    public function update(Request $request, Phone $phone, ValidatorInterface $validator, SerializerInterface $serializer, EntityManagerInterface $entityManager)
     {
         $phoneUpdate = $entityManager->getRepository(Phone::class)->find($phone->getId());
         $data = json_decode($request->getContent());
@@ -121,10 +175,29 @@ class PhoneController extends AbstractController
 
 
     /**
+     * @OA\Delete(
+     *      path="/phones/{id}",
+     *      security={"bearer"},
+     *      tags={"Phones"},
+     *      @OA\Parameter(ref="#/components/parameters/id"),
+     *      @OA\Response(
+     *          response="204",
+     *          description="Delete a Phone"
+     *      ),
+     *      @OA\Response(response="403",ref="#/components/responses/Unauthorized")
+     * )
+     * 
      * @Route("/phones/{id}", name="delete_phone", methods={"DELETE"})
      */
     public function delete(Phone $phone, EntityManagerInterface $entityManager)
     {
+        $role = $this->getUser()->getRoles();
+        if ($role[0] !== 'ROLE_ADMIN') {
+            $data = [
+                'message' => 'Access denied'
+            ];
+            return $this->json($data, 403);
+        }
         $entityManager->remove($phone);
         $entityManager->flush();
         return new Response(null, 204);
