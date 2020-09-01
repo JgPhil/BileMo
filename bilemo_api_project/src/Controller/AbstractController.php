@@ -8,8 +8,24 @@ use OpenApi\Annotations as Oa;
  * @OA\Parameter(
  *      name="id",
  *      in="path",
- *      description="Ressource ID",
+ *      description="Ressource id property",
  *      required=true,
+ *      @OA\Schema(type="integer")
+ * )
+ * 
+ * @OA\Parameter(
+ *      name="username",
+ *      in="path",
+ *      description="Ressource username property",
+ *      required=true,
+ *      @OA\Schema(type="string")
+ * )
+ * 
+ * @OA\Parameter(
+ *      name="page",
+ *      in="query",
+ *      description="the current page",
+ *      required=false,
  *      @OA\Schema(type="integer")
  * )
  * 

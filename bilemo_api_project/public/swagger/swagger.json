@@ -11,6 +11,62 @@
         }
     ],
     "paths": {
+        "/customers/{username}": {
+            "get": {
+                "tags": [
+                    "Customers"
+                ],
+                "operationId": "App\\Controller\\CustomerController::show",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/username"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Show a Customer",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Customer"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                }
+            }
+        },
+        "/customers": {
+            "get": {
+                "tags": [
+                    "Customers"
+                ],
+                "operationId": "App\\Controller\\CustomerController::index",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/page"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of customers",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Customer"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/users/{id}": {
             "get": {
                 "tags": [
@@ -40,40 +96,6 @@
                         "$ref": "#/components/responses/NotFound"
                     }
                 }
-            }
-        },
-        "/users": {
-            "get": {
-                "tags": [
-                    "Users"
-                ],
-                "operationId": "App\\Controller\\UserController::index",
-                "parameters": [
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "the current page",
-                        "required": false,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of users",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/User"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
             },
             "put": {
                 "tags": [
@@ -82,13 +104,7 @@
                 "operationId": "App\\Controller\\UserController::update",
                 "parameters": [
                     {
-                        "name": "id",
-                        "in": "path",
-                        "description": "Ressource ID",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
+                        "$ref": "#/components/parameters/id"
                     }
                 ],
                 "responses": {
@@ -110,6 +126,53 @@
                     },
                     "400": {
                         "$ref": "#/components/responses/BadRequest"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Users"
+                ],
+                "operationId": "App\\Controller\\UserController::delete",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/id"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Delete a User"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "operationId": "App\\Controller\\UserController::index",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/page"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of users",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/User"
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -143,6 +206,27 @@
     },
     "components": {
         "schemas": {
+            "Customer": {
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "username": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "users": {
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
             "User": {
                 "properties": {
                     "id": {
@@ -222,8 +306,26 @@
             "id": {
                 "name": "id",
                 "in": "path",
-                "description": "Ressource ID",
+                "description": "Ressource id property",
                 "required": true,
+                "schema": {
+                    "type": "integer"
+                }
+            },
+            "username": {
+                "name": "username",
+                "in": "path",
+                "description": "Ressource username property",
+                "required": true,
+                "schema": {
+                    "type": "string"
+                }
+            },
+            "page": {
+                "name": "page",
+                "in": "query",
+                "description": "the current page",
+                "required": false,
                 "schema": {
                     "type": "integer"
                 }

@@ -12,6 +12,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
+use OpenApi\Annotations as OA;
 
 /**
  * @Route("/api")
@@ -32,6 +33,17 @@ class CustomerController extends AbstractController
     }
 
     /**
+     * @OA\Get(
+     *      path="/customers/{username}",
+     *      tags={"Customers"},
+     *          @OA\Parameter(ref="#/components/parameters/username"),
+     *      @OA\Response(
+     *         response="200",
+     *         description="Show a Customer",
+     *         @OA\JsonContent(ref="#/components/schemas/Customer")
+     *      ),
+     *      @OA\Response(response="403",ref="#/components/responses/Unauthorized")
+     * )
      * @Route("/customers/{username}", name="show_customer", methods={"GET"})
      */
     public function show(Customer $customer)
@@ -49,6 +61,16 @@ class CustomerController extends AbstractController
     }
 
     /**
+     * @OA\Get(
+     *      path="/customers",
+     *      tags={"Customers"},
+     *      @OA\Parameter(ref="#/components/parameters/page"),
+     *      @OA\Response(
+     *          response="200",
+     *          description="List of customers",
+     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Customer"))
+     *      )
+     * )
      * @Route("/customers/{page<\d+>?1}", name="list_customers", methods={"GET"})
      */
     public function index(Request $request, CustomerRepository $repo)

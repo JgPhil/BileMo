@@ -80,13 +80,7 @@ class UserController extends AbstractController
      * @OA\Get(
      *      path="/users",
      *      tags={"Users"},
-     *      @OA\Parameter(
-     *          name="page",
-     *          in="query",
-     *          description="the current page",
-     *          required=false,
-     *          @OA\Schema(type="integer")
-     *          ),
+     *      @OA\Parameter(ref="#/components/parameters/page"),
      *      @OA\Response(
      *          response="200",
      *          description="List of users",
@@ -142,16 +136,10 @@ class UserController extends AbstractController
 
 
     /**
-    * @OA\Put(
-     *      path="/users",
+     * @OA\Put(
+     *      path="/users/{id}",
      *      tags={"Users"},
-     *      @OA\Parameter(
-     *          name="id",
-     *          in="path",
-     *          description="Ressource ID",
-     *          required=true,
-     *          @OA\Schema(type="integer")
-     *          ),
+     *      @OA\Parameter(ref="#/components/parameters/id"),
      *      @OA\Response(
      *          response="200",
      *          description="User Update",
@@ -199,6 +187,17 @@ class UserController extends AbstractController
 
 
     /**
+     * @OA\Delete(
+     *      path="/users/{id}",
+     *      tags={"Users"},
+     *      @OA\Parameter(ref="#/components/parameters/id"),
+     *      @OA\Response(
+     *          response="204",
+     *          description="Delete a User"
+     *      ),
+     *      @OA\Response(response="403",ref="#/components/responses/Unauthorized")
+     * )
+     * 
      * @Route("/users/{id}", name="delete_user", methods={"DELETE"})
      */
     public function delete(User $user, EntityManagerInterface $entityManager)
