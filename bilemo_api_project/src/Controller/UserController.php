@@ -52,7 +52,7 @@ class UserController extends AbstractController
      *          @OA\Parameter(ref="#/components/parameters/id"),
      *      @OA\Response(
      *         response="200",
-     *         description="Show a user",
+     *         description="Show a user ressource",
      *         @OA\JsonContent(ref="#/components/schemas/User"),
      *      ),
      *      @OA\Response(response="403",ref="#/components/responses/Unauthorized"),
@@ -83,7 +83,7 @@ class UserController extends AbstractController
      *      @OA\Parameter(ref="#/components/parameters/page"),
      *      @OA\Response(
      *          response="200",
-     *          description="List of users",
+     *          description="List of users ressources",
      *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/User"))
      *      )
      * )
@@ -104,8 +104,8 @@ class UserController extends AbstractController
      *      tags={"Users"},
      *      @OA\Response(
      *          response="201",
-     *          description="New user created",
-     *          @OA\JsonContent(@OA\Property(property="message", type="string", example="New user created"))
+     *          description="New user ressource created",
+     *          @OA\JsonContent(@OA\Property(property="message", type="string", example="New user ressource created"))
      *       ),
      *      @OA\Response(response="400",ref="#/components/responses/BadRequest")
      * )
@@ -148,6 +148,7 @@ class UserController extends AbstractController
      *      @OA\Response(response="403",ref="#/components/responses/Unauthorized"),
      *      @OA\Response(response="400",ref="#/components/responses/BadRequest")
      * )
+     * 
      * @Route("/users/{id}", name="update_user", methods={"PUT"})
      */
     public function update(Request $request, User $user, SerializerInterface $serializer, ValidatorInterface $validator, EntityManagerInterface $entityManager)

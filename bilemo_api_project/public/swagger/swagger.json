@@ -6,7 +6,7 @@
     },
     "servers": [
         {
-            "url": "http://API_HOST/api/v1",
+            "url": "http://localhost/api/v1",
             "description": "Api BileMo"
         }
     ],
@@ -24,7 +24,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Show a Customer",
+                        "description": "Show a customer ressource",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -52,7 +52,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of customers",
+                        "description": "List of customers ressources",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -63,6 +63,136 @@
                                 }
                             }
                         }
+                    }
+                }
+            }
+        },
+        "/phones/{id}": {
+            "get": {
+                "tags": [
+                    "Phones"
+                ],
+                "operationId": "App\\Controller\\PhoneController::show",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/id"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Shows a Phone",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Phone"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/NotFound"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Phones"
+                ],
+                "operationId": "App\\Controller\\PhoneController::update",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/id"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Phone Update",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Phone"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Phones"
+                ],
+                "operationId": "App\\Controller\\PhoneController::delete",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/id"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Delete a Phone"
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                }
+            }
+        },
+        "/phones": {
+            "get": {
+                "tags": [
+                    "Phones"
+                ],
+                "operationId": "App\\Controller\\PhoneController::index",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/page"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of phones",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Phone"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Phones"
+                ],
+                "responses": {
+                    "201": {
+                        "description": "New phone ressource created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "New phone ressource created"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
                     }
                 }
             }
@@ -80,7 +210,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Show a user",
+                        "description": "Show a user ressource",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -162,7 +292,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of users",
+                        "description": "List of users ressources",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -182,14 +312,14 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "New user created",
+                        "description": "New user ressource created",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "message": {
                                             "type": "string",
-                                            "example": "New user created"
+                                            "example": "New user ressource created"
                                         }
                                     },
                                     "type": "object"
@@ -223,6 +353,30 @@
                     },
                     "users": {
                         "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "Phone": {
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "price": {
+                        "type": "integer"
+                    },
+                    "color": {
+                        "type": "string"
+                    },
+                    "releasedAt": {
+                        "type": "string",
+                        "format": "date-time"
                     }
                 },
                 "type": "object"

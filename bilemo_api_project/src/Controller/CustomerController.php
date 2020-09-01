@@ -39,7 +39,7 @@ class CustomerController extends AbstractController
      *          @OA\Parameter(ref="#/components/parameters/username"),
      *      @OA\Response(
      *         response="200",
-     *         description="Show a Customer",
+     *         description="Show a customer ressource",
      *         @OA\JsonContent(ref="#/components/schemas/Customer")
      *      ),
      *      @OA\Response(response="403",ref="#/components/responses/Unauthorized")
@@ -67,7 +67,7 @@ class CustomerController extends AbstractController
      *      @OA\Parameter(ref="#/components/parameters/page"),
      *      @OA\Response(
      *          response="200",
-     *          description="List of customers",
+     *          description="List of customers ressources",
      *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Customer"))
      *      )
      * )
