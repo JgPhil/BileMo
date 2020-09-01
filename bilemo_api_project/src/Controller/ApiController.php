@@ -12,14 +12,9 @@ use OpenApi\Annotations as OA;
 class ApiController extends AbstractController
 {
     /**
-     * @Route("/api", name="api")
+     * @Route("/api/v1", name="api")
      */
     public function index()
     {
-        $data = [
-            "message" => "Bienvenue"
-        ];
-
-        return $this->json($data, 200);
     }
 }

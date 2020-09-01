@@ -25,7 +25,7 @@ use OpenApi\Annotations as OA;
 
 
 /**
- * @Route("/api")
+ * @Route("/api/v1")
  */
 class PhoneController extends AbstractController
 {
@@ -47,6 +47,7 @@ class PhoneController extends AbstractController
     /**
      * @OA\Get(
      *      path="/phones/{id}",
+     *      security={"bearer"},
      *      tags={"Phones"},
      *          @OA\Parameter(ref="#/components/parameters/id"),
      *      @OA\Response(
@@ -72,6 +73,7 @@ class PhoneController extends AbstractController
     /**
      * @OA\Get(
      *      path="/phones",
+     *      security={"bearer"},
      *      tags={"Phones"},
      *      @OA\Parameter(ref="#/components/parameters/page"),
      *      @OA\Response(
@@ -94,6 +96,7 @@ class PhoneController extends AbstractController
     /**
      * @OA\Post(
      *      path="/phones",
+     *      security={"bearer"},
      *      tags={"Phones"},
      *      @OA\Response(
      *          response="201",
@@ -127,6 +130,7 @@ class PhoneController extends AbstractController
     /**
      * @OA\Put(
      *      path="/phones/{id}",
+     *      security={"bearer"},
      *      tags={"Phones"},
      *      @OA\Parameter(ref="#/components/parameters/id"),
      *      @OA\Response(
@@ -173,6 +177,7 @@ class PhoneController extends AbstractController
     /**
      * @OA\Delete(
      *      path="/phones/{id}",
+     *      security={"bearer"},
      *      tags={"Phones"},
      *      @OA\Parameter(ref="#/components/parameters/id"),
      *      @OA\Response(
@@ -186,9 +191,8 @@ class PhoneController extends AbstractController
      */
     public function delete(Phone $phone, EntityManagerInterface $entityManager)
     {
-            $role = $this->getUser()->getRoles();
-
-        if ($role[0] !== 'ROLE_ADMIN'){
+        $role = $this->getUser()->getRoles();
+        if ($role[0] !== 'ROLE_ADMIN') {
             $data = [
                 'message' => 'Access denied'
             ];

@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use OpenApi\Annotations as OA;
 
 /**
- * @Route("/api")
+ * @Route("/api/v1")
  */
 class CustomerController extends AbstractController
 {
@@ -35,6 +35,7 @@ class CustomerController extends AbstractController
     /**
      * @OA\Get(
      *      path="/customers/{username}",
+     *      security={"bearer"},
      *      tags={"Customers"},
      *          @OA\Parameter(ref="#/components/parameters/username"),
      *      @OA\Response(
@@ -63,18 +64,27 @@ class CustomerController extends AbstractController
     /**
      * @OA\Get(
      *      path="/customers",
+     *      security={"bearer"},
      *      tags={"Customers"},
      *      @OA\Parameter(ref="#/components/parameters/page"),
      *      @OA\Response(
      *          response="200",
      *          description="List of customers ressources",
      *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Customer"))
-     *      )
+     *      ),
+     *      @OA\Response(response="403",ref="#/components/responses/Unauthorized")
      * )
      * @Route("/customers/{page<\d+>?1}", name="list_customers", methods={"GET"})
      */
     public function index(Request $request, CustomerRepository $repo)
     {
+        $role = $this->getUser()->getRoles();
+        if ($role[0] !== 'ROLE_ADMIN') {
+            $data = [
+                'message' => 'Access denied'
+            ];
+            return $this->json($data, 403);
+        }
         $page = $request->query->get('page');
         if (is_null($page) || $page < 1) {
             $page = 1;

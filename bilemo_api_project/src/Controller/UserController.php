@@ -26,7 +26,7 @@ use OpenApi\Annotations as OA;
 
 /**
  * 
- * @Route("/api")
+ * @Route("/api/v1")
  */
 class UserController extends AbstractController
 {
@@ -48,6 +48,7 @@ class UserController extends AbstractController
     /**
      * @OA\Get(
      *      path="/users/{id}",
+     *      security={"bearer"},
      *      tags={"Users"},
      *          @OA\Parameter(ref="#/components/parameters/id"),
      *      @OA\Response(
@@ -56,7 +57,7 @@ class UserController extends AbstractController
      *         @OA\JsonContent(ref="#/components/schemas/User"),
      *      ),
      *      @OA\Response(response="403",ref="#/components/responses/Unauthorized"),
-     *      @OA\Response(response="404",ref="#/components/responses/NotFound")
+     *      @OA\Response(response="404",ref="#/components/responses/NotFound"), 
      * ) 
      * 
      * @Route("/users/{id}", name="show_user", methods={"GET"})
@@ -79,6 +80,7 @@ class UserController extends AbstractController
     /**
      * @OA\Get(
      *      path="/users",
+     *      security={"bearer"},
      *      tags={"Users"},
      *      @OA\Parameter(ref="#/components/parameters/page"),
      *      @OA\Response(
@@ -101,6 +103,7 @@ class UserController extends AbstractController
     /**
      * @OA\Post(
      *      path="/users",
+     *      security={"bearer"},
      *      tags={"Users"},
      *      @OA\Response(
      *          response="201",
@@ -138,6 +141,7 @@ class UserController extends AbstractController
     /**
      * @OA\Put(
      *      path="/users/{id}",
+     *      security={"bearer"},
      *      tags={"Users"},
      *      @OA\Parameter(ref="#/components/parameters/id"),
      *      @OA\Response(
@@ -190,6 +194,7 @@ class UserController extends AbstractController
     /**
      * @OA\Delete(
      *      path="/users/{id}",
+     *      security={"bearer"},
      *      tags={"Users"},
      *      @OA\Parameter(ref="#/components/parameters/id"),
      *      @OA\Response(

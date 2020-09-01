@@ -6,7 +6,7 @@
     },
     "servers": [
         {
-            "url": "http://localhost/api/v1",
+            "url": "/api/v1",
             "description": "Api BileMo"
         }
     ],
@@ -36,7 +36,12 @@
                     "403": {
                         "$ref": "#/components/responses/Unauthorized"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "scalar": "bearer"
+                    }
+                ]
             }
         },
         "/customers": {
@@ -63,8 +68,16 @@
                                 }
                             }
                         }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Unauthorized"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "scalar": "bearer"
+                    }
+                ]
             }
         },
         "/phones/{id}": {
@@ -92,7 +105,12 @@
                     "404": {
                         "$ref": "#/components/responses/NotFound"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "scalar": "bearer"
+                    }
+                ]
             },
             "put": {
                 "tags": [
@@ -121,7 +139,12 @@
                     "400": {
                         "$ref": "#/components/responses/BadRequest"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "scalar": "bearer"
+                    }
+                ]
             },
             "delete": {
                 "tags": [
@@ -140,7 +163,12 @@
                     "403": {
                         "$ref": "#/components/responses/Unauthorized"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "scalar": "bearer"
+                    }
+                ]
             }
         },
         "/phones": {
@@ -168,7 +196,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "scalar": "bearer"
+                    }
+                ]
             },
             "post": {
                 "tags": [
@@ -193,6 +226,44 @@
                     },
                     "400": {
                         "$ref": "#/components/responses/BadRequest"
+                    }
+                },
+                "security": [
+                    {
+                        "scalar": "bearer"
+                    }
+                ]
+            }
+        },
+        "/login": {
+            "post": {
+                "tags": [
+                    "Security"
+                ],
+                "operationId": "App\\Controller\\SecurityController::login",
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "query",
+                        "description": "customer username",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "password",
+                        "in": "query",
+                        "description": "customer password",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Authentication success"
                     }
                 }
             }
@@ -225,7 +296,12 @@
                     "404": {
                         "$ref": "#/components/responses/NotFound"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "scalar": "bearer"
+                    }
+                ]
             },
             "put": {
                 "tags": [
@@ -257,7 +333,12 @@
                     "400": {
                         "$ref": "#/components/responses/BadRequest"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "scalar": "bearer"
+                    }
+                ]
             },
             "delete": {
                 "tags": [
@@ -276,7 +357,12 @@
                     "403": {
                         "$ref": "#/components/responses/Unauthorized"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "scalar": "bearer"
+                    }
+                ]
             }
         },
         "/users": {
@@ -304,7 +390,12 @@
                             }
                         }
                     }
-                }
+                },
+                "security": [
+                    {
+                        "scalar": "bearer"
+                    }
+                ]
             },
             "post": {
                 "tags": [
@@ -330,7 +421,12 @@
                     "400": {
                         "$ref": "#/components/responses/BadRequest"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "scalar": "bearer"
+                    }
+                ]
             }
         }
     },
@@ -483,6 +579,14 @@
                 "schema": {
                     "type": "integer"
                 }
+            }
+        },
+        "securitySchemes": {
+            "bearer": {
+                "type": "apiKey",
+                "name": "BEARER",
+                "in": "cookie",
+                "bearerFormat": "JWT"
             }
         }
     }

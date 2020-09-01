@@ -46,6 +46,9 @@ use OpenApi\Annotations as Oa;
  *      description="Bad Request",
  *      @OA\JsonContent(@OA\Property(property="message", type="string", example="A certain field was missing in the body"))
  *  )
+ * 
+ * @OA\SecurityScheme(bearerFormat="JWT", type="apiKey", securityScheme="bearer", in="cookie", name="BEARER")
+ * 
  */
 class AbstractController extends \Symfony\Bundle\FrameworkBundle\Controller\AbstractController
 {
