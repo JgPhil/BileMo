@@ -64,7 +64,11 @@ class PhoneController extends AbstractController
     {
         $phone = $phoneRepository->find($id);
         if (!is_null($phone)) {
-            return $this->json($phone, 200);
+            return $this->json($phone, 200, [
+                'Cache-Control' => 'public',
+                'maxage' => 3600,
+                'must-revalidate' => true
+            ]);
         }
         $data = "Ressource not found";
         return $this->json($data, 404);
@@ -90,7 +94,15 @@ class PhoneController extends AbstractController
         if (is_null($page) || $page < 1) {
             $page = 1;
         }
-        return $this->json($phoneRepository->findAllPhones($page, $this->getParameter('limit')), 200);
+        return $this->json(
+            $phoneRepository->findAllPhones($page, $this->getParameter('limit')),
+            200,
+            [
+                'Cache-Control' => 'public',
+                'maxage' => 3600,
+                'must-revalidate' => true
+            ]
+        );
     }
 
     /**
