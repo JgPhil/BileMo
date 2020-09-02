@@ -87,7 +87,7 @@ Launch the creation of the database:</p>
 <pre><code>php bin/console serve -d
 </code></pre>
 <p>
-Then consult the documentation at this URL <a href="http://localhost:8000/api/v1/swagger/#/" rel="nofollow">http://localhost:8000/api/v1/#/</a> from your browser.
+Then consult the documentation at this URL <a href="http://localhost:8000/swagger/" rel="nofollow">http://localhost:8000/swagger/</a> from your browser.
 </p>
 <h3>Login credentials</h3>
 <p>You can access to the administrator apis with this credentials:</p>
