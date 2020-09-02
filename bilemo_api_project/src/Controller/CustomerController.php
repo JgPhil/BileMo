@@ -52,7 +52,16 @@ class CustomerController extends AbstractController
         $user = $this->getUser();
 
         if ($user == $customer) {
-            return $this->json($customer, 200, [], ['groups' => 'customer_read']);
+            return $this->json(
+                $customer,
+                200,
+                [
+                    'Cache-Control' => 'public',
+                    'maxage' => 3600,
+                    'must-revalidate' => true
+                ],
+                ['groups' => 'customer_read']
+            );
         } else {
             $data = [
                 'message' => 'Access denied'
@@ -89,6 +98,10 @@ class CustomerController extends AbstractController
         if (is_null($page) || $page < 1) {
             $page = 1;
         }
-        return $this->json($repo->findAllCustomers($page, $this->getParameter('limit')), 200, [], ['groups' => 'customer_read']);
+        return $this->json($repo->findAllCustomers($page, $this->getParameter('limit')), 200, [
+            'Cache-Control' => 'public',
+            'maxage' => 3600,
+            'must-revalidate' => true
+        ], ['groups' => 'customer_read']);
     }
 }

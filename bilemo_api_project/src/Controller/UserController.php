@@ -67,7 +67,11 @@ class UserController extends AbstractController
         $user = $userRepository->find($id);
         if (!is_null($user)) {
             if ($user->getCustomer() === $this->getUser()) {
-                return $this->json($user, 200, [], ['groups' => 'user_read']);
+                return $this->json($user, 200, [
+                    'Cache-Control' => 'public',
+                    'maxage' => 3600,
+                    'must-revalidate' => true
+                ], ['groups' => 'user_read']);
             } else {
                 $data = "Access denied";
                 return $this->json($data, 403);
@@ -97,7 +101,16 @@ class UserController extends AbstractController
         if (is_null($page) || $page < 1) {
             $page = 1;
         }
-        return $this->json($userRepository->findAllCustomerUsers($this->getUser(), $page, $this->getParameter('limit')), 200, [], ['groups' => 'user_read']);
+
+        return $this->json($userRepository->findAllCustomerUsers(
+            $this->getUser(),
+            $page,
+            $this->getParameter('limit')
+        ), 200, [
+            'Cache-Control' => 'public',
+            'maxage' => 3600,
+            'must-revalidate' => true
+        ], ['groups' => 'user_read']);
     }
 
     /**

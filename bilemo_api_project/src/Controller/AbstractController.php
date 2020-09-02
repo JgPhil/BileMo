@@ -51,5 +51,6 @@ use OpenApi\Annotations as Oa;
  * 
  */
 class AbstractController extends \Symfony\Bundle\FrameworkBundle\Controller\AbstractController
-{
+{  
+
 }
