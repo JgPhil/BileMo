@@ -84,7 +84,7 @@ Launch the creation of the database:</p>
 
 <h3>LexikJWTAuthenticationBundle installation & configuration</h3>
 <h4>Installation</h4>
-<p>The bundle is automatically installed with composer, but we have somme more manual work here.</p>
+<p>The bundle is automatically installed with composer, but we have some more manual work here.</p>
 <p>Configure the SSH keys path in your <code>config/packages/lexik_jwt_authentication.yaml</code> :</p>
 <div class="highlight highlight-source-yaml"><pre><span class="pl-ent">lexik_jwt_authentication</span>:
     <span class="pl-ent">secret_key</span>:       <span class="pl-s"><span class="pl-pds">'</span>%kernel.project_dir%/config/jwt/private.pem<span class="pl-pds">'</span></span> <span class="pl-c"><span class="pl-c">#</span> required for token creation</span>
