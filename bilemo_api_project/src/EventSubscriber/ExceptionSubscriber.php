@@ -14,7 +14,7 @@ class ExceptionSubscriber implements EventSubscriberInterface
     {
 
         $response = new JsonResponse();
-        /* 
+        
         $exception = $event->getThrowable();
         if ($exception instanceof HttpExceptionInterface) {
             $data = [
@@ -29,12 +29,12 @@ class ExceptionSubscriber implements EventSubscriberInterface
             $response->setData([
                 'message' => $exception->getMessage()
             ]);
-        } */
-        $response->setStatusCode(Response::HTTP_BAD_REQUEST);
+        } 
+        /* $response->setStatusCode(Response::HTTP_BAD_REQUEST);
         $response->setJson("");
         $response->setData([
             'message' => "Bad Request"
-        ]);
+        ]); */
         $event->setResponse($response);
     }
 

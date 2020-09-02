@@ -18,7 +18,7 @@ class AppFixtures extends Fixture
         //----------------------CUSTOMERS--------------------
         // customer with ROLE_USER
         $customer = new Customer();
-        $customer->setUsername('customer')
+        $customer->setUsername('customer_user')
             ->setPassword(password_hash('password', PASSWORD_BCRYPT))
             ->setEmail('customer@customer.fr')
             ->setCreatedAt(new DateTime('now'))
@@ -27,8 +27,8 @@ class AppFixtures extends Fixture
 
         // customer with ROLE_ADMIN
         $adminCustomer = new Customer();
-        $adminCustomer->setUsername('admin')
-            ->setPassword(password_hash('admin', PASSWORD_BCRYPT))
+        $adminCustomer->setUsername('admin_user')
+            ->setPassword(password_hash('password', PASSWORD_BCRYPT))
             ->setEmail('admin@admin.fr')
             ->setCreatedAt(new DateTime('now'))
             ->setRoles(['ROLE_ADMIN']);
