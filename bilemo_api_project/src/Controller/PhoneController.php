@@ -21,6 +21,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use OpenApi\Annotations as OA;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 
 
