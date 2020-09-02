@@ -18,20 +18,23 @@ class SecurityController extends AbstractController
      * @OA\Post(
      *      path="/login",
      *      tags={"Security"},
-     *      @OA\Parameter(
-     *          name="username",
-     *          in="query",
-     *          description="customer username",
-     *          required=true,
-     *          @OA\Schema(type="string")
-     *      ),
-     *      @OA\Parameter(
-     *          name="password",
-     *          in="query",
-     *          description="customer password",
-     *          required=true,
-     *          @OA\Schema(type="string")
-     *      ),
+     *      @OA\RequestBody(
+     *    		@OA\MediaType(
+     *    			mediaType="application/json",
+     *    			@OA\Schema(
+     *    				 @OA\Property(property="username",
+     *    					type="string",
+     *    					example="",
+     *    					description=""
+     *    				),
+     *    				 @OA\Property(property="password",
+     *    					type="string",
+     *    					example="",
+     *    					description=""
+     *    				)
+     *    			),
+     *    		),
+     *    	),
      *      @OA\Response(
      *          response=204,
      *          description="Authentication success")
@@ -42,6 +45,4 @@ class SecurityController extends AbstractController
     public function login()
     {
     }
-
-
 }
