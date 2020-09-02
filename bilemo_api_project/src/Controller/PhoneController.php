@@ -119,6 +119,7 @@ class PhoneController extends AbstractController
      * )
      * 
      * @Route("/phones", name="add_phone", methods={"POST"})
+     * @IsGranted("ROLE_ADMIN")
      */
     public function new(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator)
     {
@@ -154,6 +155,7 @@ class PhoneController extends AbstractController
      * )
      * 
      * @Route("/phones/{id}", name="update_phone", methods={"PUT"})
+     * @IsGranted("ROLE_ADMIN")
      */
     public function update(Request $request, Phone $phone, ValidatorInterface $validator, SerializerInterface $serializer, EntityManagerInterface $entityManager)
     {
@@ -200,6 +202,7 @@ class PhoneController extends AbstractController
      * )
      * 
      * @Route("/phones/{id}", name="delete_phone", methods={"DELETE"})
+     * @IsGranted("ROLE_ADMIN")
      */
     public function delete(Phone $phone, EntityManagerInterface $entityManager)
     {

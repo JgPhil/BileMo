@@ -84,6 +84,7 @@ class CustomerController extends AbstractController
      *      @OA\Response(response="403",ref="#/components/responses/Unauthorized")
      * )
      * @Route("/customers/{page<\d+>?1}", name="list_customers", methods={"GET"})
+     * @IsGranted("ROLE_ADMIN")
      */
     public function index(Request $request, CustomerRepository $repo)
     {
