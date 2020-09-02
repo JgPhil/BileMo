@@ -61,7 +61,7 @@
     <p>Manually download the content of the Github repository to a location on your file system.<br>
         You can also use git.<br>
         In Git, go to the chosen location and execute the following command:</p>
-    <pre><code>git clone https://github.com/JgPhil/Snowtricks.git .</code></pre>
+    <pre><code>git clone https://github.com/JgPhil/BileMo.git .</code></pre>
     <p>Open a command console and join the application root directory.<br>
         Install dependencies by running the following command:</p>
     <pre><code>composer install</code></pre>
@@ -81,6 +81,40 @@ Launch the creation of the database:</p>
 <p>Finally, load the initial dataset into the database :</p>
 <pre><code>php bin/console doctrine:fixtures:load
 </code></pre>
+
+<h3>LexikJWTAuthenticationBundle installation & configuration</h3>
+<h4>Installation</h4>
+<p>The bundle is automatically installed with composer, but we have somme more manual work here.</p>
+<p>Configure the SSH keys path in your <code>config/packages/lexik_jwt_authentication.yaml</code> :</p>
+<div class="highlight highlight-source-yaml"><pre><span class="pl-ent">lexik_jwt_authentication</span>:
+    <span class="pl-ent">secret_key</span>:       <span class="pl-s"><span class="pl-pds">'</span>%kernel.project_dir%/config/jwt/private.pem<span class="pl-pds">'</span></span> <span class="pl-c"><span class="pl-c">#</span> required for token creation</span>
+    <span class="pl-ent">public_key</span>:       <span class="pl-s"><span class="pl-pds">'</span>%kernel.project_dir%/config/jwt/public.pem<span class="pl-pds">'</span></span>  <span class="pl-c"><span class="pl-c">#</span> required for token verification</span>
+    <span class="pl-ent">pass_phrase</span>:      <span class="pl-s"><span class="pl-pds">'</span>your_secret_passphrase<span class="pl-pds">'</span></span> <span class="pl-c"><span class="pl-c">#</span> required for token creation, usage of an environment variable is recommended</span>
+    <span class="pl-ent">token_ttl</span>:        <span class="pl-c1">3600</span></pre></div>
+<p>Configure your <code>config/packages/security.yaml</code> :</p>
+<div class="highlight highlight-source-yaml"><pre><span class="pl-ent">security</span>:
+    <span class="pl-c"><span class="pl-c">#</span> ...</span>    
+    <span class="pl-ent">firewalls</span>:
+        <span class="pl-ent">login</span>:
+            <span class="pl-ent">pattern</span>:  <span class="pl-s">^/api/login</span>
+            <span class="pl-ent">stateless</span>: <span class="pl-c1">true</span>
+            <span class="pl-ent">anonymous</span>: <span class="pl-c1">true</span>
+            <span class="pl-ent">json_login</span>:
+                <span class="pl-ent">check_path</span>:               <span class="pl-s">/api/login_check</span>
+                <span class="pl-ent">success_handler</span>:          <span class="pl-s">lexik_jwt_authentication.handler.authentication_success</span>
+                <span class="pl-ent">failure_handler</span>:          <span class="pl-s">lexik_jwt_authentication.handler.authentication_failure</span>
+ <span class="pl-ent">api</span>:
+            <span class="pl-ent">pattern</span>:   <span class="pl-s">^/api</span>
+            <span class="pl-ent">stateless</span>: <span class="pl-c1">true</span>
+            <span class="pl-ent">guard</span>:
+                <span class="pl-ent">authenticators</span>:
+                    - <span class="pl-s">lexik_jwt_authentication.jwt_token_authenticator</span>
+    <span class="pl-ent">access_control</span>:
+        - <span class="pl-s">{ path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }</span>
+        - <span class="pl-s">{ path: ^/api,       roles: IS_AUTHENTICATED_FULLY }</span></pre></div>
+<p>Configure your routing into <code>config/routes.yaml</code> :</p>
+<div class="highlight highlight-source-yaml"><pre><span class="pl-ent">api_login_check</span>:
+    <span class="pl-ent">path</span>: <span class="pl-s">/api/login_check</span></pre></div>
 <h3>Run the web application</h3>
 <h4>By WebServerBundle</h4>
 <p>Launch the Apache/Php runtime environment by using Symfony via the following command:</p>
