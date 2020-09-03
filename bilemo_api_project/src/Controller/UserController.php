@@ -119,7 +119,7 @@ class UserController extends AbstractController
     {
         $data = $request->getContent();
         $user = $serializer->deserialize($data, User::class, 'json', ['groups' => 'user_read']);
-        $customer = $customerRepository->find(1);
+        $customer = $this->getUser();
 
         $errors = $validator->validate($user, [], ['groups' => 'user_read']);
         if (count($errors)) {
