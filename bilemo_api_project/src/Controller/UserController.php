@@ -30,21 +30,6 @@ use OpenApi\Annotations as OA;
  */
 class UserController extends AbstractController
 {
-
-    protected $encoder;
-    protected $normalizer;
-    protected $serializer;
-
-
-    public function __construct()
-    {
-        $this->encoder = new JsonEncoder();
-        $this->normalizer = new GetSetMethodNormalizer(null, null, null, null, null, $this->getDefaultContext());
-        $this->serializer = new Serializer([$this->normalizer], [$this->encoder]);
-    }
-
-
-
     /**
      * @OA\Get(
      *      path="/users/{id}",
@@ -110,7 +95,9 @@ class UserController extends AbstractController
             'Cache-Control' => 'public',
             'maxage' => 3600,
             'must-revalidate' => true
-        ], ['groups' => 'user_read']);
+        ], [
+            'groups' => 'user_read'
+        ]);
     }
 
     /**

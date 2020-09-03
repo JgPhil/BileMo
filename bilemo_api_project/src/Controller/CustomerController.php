@@ -20,19 +20,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
  */
 class CustomerController extends AbstractController
 {
-
-    protected $encoder;
-    protected $normalizer;
-    protected $serializer;
-
-
-    public function __construct()
-    {
-        $this->encoder = new JsonEncoder();
-        $this->normalizer = new GetSetMethodNormalizer(null, null, null, null, null, $this->getDefaultContext());
-        $this->serializer = new Serializer([$this->normalizer], [$this->encoder]);
-    }
-
     /**
      * @OA\Get(
      *      path="/customers/{username}",
@@ -61,7 +48,9 @@ class CustomerController extends AbstractController
                     'maxage' => 3600,
                     'must-revalidate' => true
                 ],
-                ['groups' => 'customer_read']
+                [
+                    'groups' => 'customer_read'
+                ]
             );
         } else {
             $data = [
@@ -104,6 +93,6 @@ class CustomerController extends AbstractController
             'Cache-Control' => 'public',
             'maxage' => 3600,
             'must-revalidate' => true
-        ], ['groups' => 'customer_read']);
+        ]);
     }
 }
