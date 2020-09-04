@@ -6,15 +6,40 @@ use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
 use DateTimeInterface;
-use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use JMS\Serializer\Annotation as Serializer;
+use JMS\Serializer\SerializationContext;
 use OpenApi\Annotations as OA;
+use Hateoas\Configuration\Annotation as Hateoas;
 
 /**
  * @OA\Schema()
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @UniqueEntity("email")
+ * 
+ * 
+ * @Hateoas\Relation(
+ *      "self",
+ *      href = @Hateoas\Route(
+ *          "show_user",
+ *          parameters = { "id" = "expr(object.getId())" },
+ *          absolute=true
+ *      )
+ * )
+ * 
+ * 
+ * @Hateoas\Relation(
+ *      "customer",
+ *      href = @Hateoas\Route(
+ *          "show_customer",
+ *          parameters = { "username" = "expr(object.getCustomer().getUsername())" },
+ *          absolute=true
+ *      )
+ * )
+ * 
+ * @Serializer\ExclusionPolicy("ALL")
+ * 
  */
 class User
 {
@@ -24,7 +49,7 @@ class User
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"user_read", "customer_read"})
+     * @Serializer\Expose
      */
     private $id;
 
@@ -33,7 +58,7 @@ class User
      * @var string
      * @OA\Property(type="string")
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user_read", "customer_read"})
+     * @Serializer\Expose
      */
     private $firstName;
 
@@ -41,7 +66,7 @@ class User
      * @var string
      * @OA\Property(type="string")
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user_read", "customer_read"})
+     * @Serializer\Expose
      */
     private $lastName;
 
@@ -49,7 +74,7 @@ class User
      * @var string
      * @OA\Property(type="string")
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user_read", "customer_read"})
+     * @Serializer\Expose
      */
     private $email;
 
@@ -57,7 +82,7 @@ class User
      * @var \DateTimeInterface
      * @OA\Property(type="string", format="date-time")
      * @ORM\Column(type="datetime")
-     * @Groups({"user_read", "customer_read"})
+     * @Serializer\Expose
      */
     private $createdAt;
 

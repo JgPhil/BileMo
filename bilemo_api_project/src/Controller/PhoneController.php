@@ -7,15 +7,16 @@ use App\Entity\Phone;
 use App\Repository\PhoneRepository;
 use Doctrine\ORM\Mapping\Annotation;
 use App\Repository\CustomerRepository;
+use App\Controller\DefaultController;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use JMS\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
@@ -28,23 +29,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 /**
  * @Route("/api/v1")
  */
-class PhoneController extends AbstractController
+class PhoneController extends DefaultController
 {
-    /* 
-    protected $encoder;
-    protected $normalizer;
-    protected $serializer;
-
-
-    public function __construct()
-    {
-        $this->encoder = new JsonEncoder();
-        $this->normalizer = new GetSetMethodNormalizer(null, null, null, null, null, $this->getDefaultContext());
-        $this->serializer = new Serializer([$this->normalizer], [$this->encoder]);
-    }
- */
-
-
     /**
      * @OA\Get(
      *      path="/phones/{id}",
@@ -61,15 +47,13 @@ class PhoneController extends AbstractController
      * 
      * @Route("/phones/{id}", name="show_phone", methods={"GET"})
      */
-    public function show($id, PhoneRepository $phoneRepository)
+    public function show($id, PhoneRepository $phoneRepository, SerializerInterface $serializer)
     {
         $phone = $phoneRepository->find($id);
+
+
         if (!is_null($phone)) {
-            return $this->json($phone, 200, [
-                'Cache-Control' => 'public',
-                'maxage' => 3600,
-                'must-revalidate' => true
-            ]);
+            return $this->successResponse->setContent($serializer->serialize($phone, 'json'));
         }
         $data = "Ressource not found";
         return $this->json($data, 404);
@@ -89,21 +73,14 @@ class PhoneController extends AbstractController
      * )
      * @Route("/phones/{page<\d+>?1}", name="list_phone", methods={"GET"})
      */
-    public function index(Request $request, PhoneRepository $phoneRepository)
+    public function index(Request $request, PhoneRepository $phoneRepository, SerializerInterface $serializer)
     {
         $page = $request->query->get('page');
         if (is_null($page) || $page < 1) {
             $page = 1;
         }
-        return $this->json(
-            $phoneRepository->findAllPhones($page, $this->getParameter('limit')),
-            200,
-            [
-                'Cache-Control' => 'public',
-                'maxage' => 3600,
-                'must-revalidate' => true
-            ]
-        );
+        $phones = $phoneRepository->findAllPhones($page, $this->getParameter('limit'))->getIterator();
+        return $this->successResponse->setContent($serializer->serialize($phones, 'json'));
     }
 
     /**
@@ -164,7 +141,7 @@ class PhoneController extends AbstractController
         $data = json_decode($request->getContent());
         //Setters Construction
         foreach ($data as $key => $value) {
-            if ($key !== "id") {
+            if ($key !== "id") {                
                 if ($key === "releasedAt") {
                     $value = new DateTime($value);
                     $key = "ReleasedAt";

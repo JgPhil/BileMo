@@ -9,11 +9,17 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use OpenApi\Annotations as OA;
+use JMS\Serializer\Annotation as Serializer;
+use JMS\Serializer\SerializationContext;
+
+
 
 /**
  * @OA\Schema()
  * @ORM\Entity(repositoryClass=PhoneRepository::class)
  * @UniqueEntity("name")
+ * 
+ * 
  */
 class Phone
 {

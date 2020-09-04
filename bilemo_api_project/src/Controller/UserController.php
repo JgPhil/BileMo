@@ -2,25 +2,28 @@
 
 namespace App\Controller;
 
-use App\Entity\Customer;
 use DateTime;
 use App\Entity\User;
-use App\Repository\CustomerRepository;
+use App\Entity\Customer;
+use OpenApi\Annotations as OA;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping\Annotation;
+use App\Repository\CustomerRepository;
+use App\Controller\DefaultController;
+use JMS\Serializer\SerializerInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use JMS\Serializer\SerializationContext;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use OpenApi\Annotations as OA;
+use Hateoas\Serializer\SerializerInterface as SerializerSerializerInterface;
 
 
 
@@ -28,22 +31,8 @@ use OpenApi\Annotations as OA;
  * 
  * @Route("/api/v1")
  */
-class UserController extends AbstractController
+class UserController extends DefaultController
 {
-
-    protected $encoder;
-    protected $normalizer;
-    protected $serializer;
-
-
-    public function __construct()
-    {
-        $this->encoder = new JsonEncoder();
-        $this->normalizer = new GetSetMethodNormalizer(null, null, null, null, null, $this->getDefaultContext());
-        $this->serializer = new Serializer([$this->normalizer], [$this->encoder]);
-    }
-
-
 
     /**
      * @OA\Get(
@@ -62,16 +51,12 @@ class UserController extends AbstractController
      * 
      * @Route("/users/{id}", name="show_user", methods={"GET"})
      */
-    public function show($id, UserRepository $userRepository)
+    public function show($id, UserRepository $userRepository, SerializerInterface $serializer)
     {
         $user = $userRepository->find($id);
         if (!is_null($user)) {
             if ($user->getCustomer() === $this->getUser()) {
-                return $this->json($user, 200, [
-                    'Cache-Control' => 'public',
-                    'maxage' => 3600,
-                    'must-revalidate' => true
-                ], ['groups' => 'user_read']);
+                return $this->successResponse->setContent($serializer->serialize($user, 'json'));
             } else {
                 $data = "Access denied";
                 return $this->json($data, 403);
@@ -95,22 +80,14 @@ class UserController extends AbstractController
      * )
      * @Route("/users/{page<\d+>?1}", name="list_user", methods={"GET"})
      */
-    public function index(Request $request, UserRepository $userRepository)
+    public function index(Request $request, UserRepository $userRepository, SerializerInterface $serializer)
     {
         $page = $request->query->get('page');
         if (is_null($page) || $page < 1) {
             $page = 1;
         }
-
-        return $this->json($userRepository->findAllCustomerUsers(
-            $this->getUser(),
-            $page,
-            $this->getParameter('limit')
-        ), 200, [
-            'Cache-Control' => 'public',
-            'maxage' => 3600,
-            'must-revalidate' => true
-        ], ['groups' => 'user_read']);
+        $users = $userRepository->findAllCustomerUsers($this->getUser(),$page,$this->getParameter('limit'))->getIterator();
+        return $this->successResponse->setContent($serializer->serialize($users, 'json'));
     }
 
     /**
@@ -131,8 +108,8 @@ class UserController extends AbstractController
     public function new(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator, CustomerRepository $customerRepository)
     {
         $data = $request->getContent();
-        $user = $serializer->deserialize($data, User::class, 'json', ['groups' => 'user_read']);
-        $customer = $customerRepository->find(1);
+        $user = $serializer->deserialize($data, User::class, 'json');
+        $customer = $this->getUser();
 
         $errors = $validator->validate($user, [], ['groups' => 'user_read']);
         if (count($errors)) {

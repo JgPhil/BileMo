@@ -3,35 +3,25 @@
 namespace App\Controller;
 
 use App\Entity\Customer;
+use OpenApi\Annotations as OA;
 use App\Repository\CustomerRepository;
+use App\Controller\DefaultController;
+use JMS\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
-use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 
 /**
  * @Route("/api/v1")
  */
-class CustomerController extends AbstractController
+class CustomerController extends DefaultController
 {
-
-    protected $encoder;
-    protected $normalizer;
-    protected $serializer;
-
-
-    public function __construct()
-    {
-        $this->encoder = new JsonEncoder();
-        $this->normalizer = new GetSetMethodNormalizer(null, null, null, null, null, $this->getDefaultContext());
-        $this->serializer = new Serializer([$this->normalizer], [$this->encoder]);
-    }
 
     /**
      * @OA\Get(
@@ -48,21 +38,12 @@ class CustomerController extends AbstractController
      * )
      * @Route("/customers/{username}", name="show_customer", methods={"GET"})
      */
-    public function show(Customer $customer)
+    public function show(Customer $customer, SerializerInterface $serializer)
     {
         $user = $this->getUser();
 
-        if ($user == $customer) {
-            return $this->json(
-                $customer,
-                200,
-                [
-                    'Cache-Control' => 'public',
-                    'maxage' => 3600,
-                    'must-revalidate' => true
-                ],
-                ['groups' => 'customer_read']
-            );
+        if ($user == $customer || $user->getRoles()[0] === 'ROLE_ADMIN') {
+            return $this->successResponse->setContent($serializer->serialize($user, 'json'), $this->userListContext);
         } else {
             $data = [
                 'message' => 'Access denied'
@@ -87,7 +68,7 @@ class CustomerController extends AbstractController
      * @Route("/customers/{page<\d+>?1}", name="list_customers", methods={"GET"})
      * @IsGranted("ROLE_ADMIN")
      */
-    public function index(Request $request, CustomerRepository $repo)
+    public function index(Request $request, CustomerRepository $repo, SerializerInterface $serializer)
     {
         $role = $this->getUser()->getRoles();
         if ($role[0] !== 'ROLE_ADMIN') {
@@ -100,10 +81,7 @@ class CustomerController extends AbstractController
         if (is_null($page) || $page < 1) {
             $page = 1;
         }
-        return $this->json($repo->findAllCustomers($page, $this->getParameter('limit')), 200, [
-            'Cache-Control' => 'public',
-            'maxage' => 3600,
-            'must-revalidate' => true
-        ], ['groups' => 'customer_read']);
+        $customers = $repo->findAllCustomers($page, $this->getParameter('limit'))->getIterator();
+        return $this->successResponse->setContent($serializer->serialize($customers, 'json', $this->listSerialisationContext));
     }
 }
