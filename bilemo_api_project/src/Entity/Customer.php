@@ -9,10 +9,13 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use OpenApi\Annotations as OA;
+use JMS\Serializer\Annotation as Serializer;
+use JMS\Serializer\SerializationContext;
 
 /**
  * @OA\Schema()
  * @ORM\Entity(repositoryClass=CustomerRepository::class)
+ * 
  */
 class Customer implements UserInterface
 {
@@ -22,7 +25,8 @@ class Customer implements UserInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"user_read", "customer_read"})
+     * 
+     * @Serializer\Groups({"detail", "list"})
      */
     private $id;
 
@@ -30,7 +34,8 @@ class Customer implements UserInterface
      * @var string
      * @OA\Property(type="string")
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user_read", "customer_read"})
+     * 
+     * @Serializer\Groups({"detail", "list"})
      */
     private $username;
 
@@ -38,7 +43,8 @@ class Customer implements UserInterface
      * @var string
      * @OA\Property(type="string")
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user_read", "customer_read"})
+     * 
+     * @Serializer\Groups({"detail", "list"})
      */
     private $email;
 
@@ -46,7 +52,8 @@ class Customer implements UserInterface
      * @var \DateTimeInterface
      * @OA\Property(type="string", format="date-time")
      * @ORM\Column(type="datetime")
-     * @Groups({"user_read", "customer_read"})
+     * 
+     * @Serializer\Groups({"detail", "list"})
      */
     private $createdAt;
 
@@ -54,6 +61,7 @@ class Customer implements UserInterface
      * @OA\Property(type="object")
      * @var ArrayCollection
      * @ORM\OneToMany(targetEntity=User::class, mappedBy="customer", orphanRemoval=true)
+     * 
      */
     private $users;
 
@@ -64,7 +72,6 @@ class Customer implements UserInterface
 
     /**
      * @ORM\Column(type="json")
-     * @Groups({"user_read"})
      */
     private $roles = [];
 

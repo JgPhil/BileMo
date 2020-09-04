@@ -6,9 +6,10 @@ use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
 use DateTimeInterface;
-use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use JMS\Serializer\Annotation as Serializer;
+use JMS\Serializer\SerializationContext;
 use OpenApi\Annotations as OA;
 
 /**
@@ -24,7 +25,7 @@ class User
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"user_read", "customer_read"})
+     * @Serializer\Groups({"detail", "list"})
      */
     private $id;
 
@@ -33,7 +34,7 @@ class User
      * @var string
      * @OA\Property(type="string")
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user_read", "customer_read"})
+     * @Serializer\Groups({"detail", "list"})
      */
     private $firstName;
 
@@ -41,7 +42,7 @@ class User
      * @var string
      * @OA\Property(type="string")
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user_read", "customer_read"})
+     * @Serializer\Groups({"detail", "list"})
      */
     private $lastName;
 
@@ -49,7 +50,7 @@ class User
      * @var string
      * @OA\Property(type="string")
      * @ORM\Column(type="string", length=255)
-     * @Groups({"user_read", "customer_read"})
+     * @Serializer\Groups({"detail", "list"})
      */
     private $email;
 
@@ -57,7 +58,7 @@ class User
      * @var \DateTimeInterface
      * @OA\Property(type="string", format="date-time")
      * @ORM\Column(type="datetime")
-     * @Groups({"user_read", "customer_read"})
+     * @Serializer\Groups({"detail", "list"})
      */
     private $createdAt;
 
@@ -66,6 +67,7 @@ class User
      * @var Customer
      * @ORM\ManyToOne(targetEntity=Customer::class, inversedBy="users", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
+     * @Serializer\Groups({"detail"})
      */
     private $customer;
 
