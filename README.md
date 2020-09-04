@@ -85,6 +85,12 @@ Launch the creation of the database:</p>
 <h3>LexikJWTAuthenticationBundle installation & configuration</h3>
 <h4>Installation</h4>
 <p>The bundle is automatically installed with composer, but we have some more manual work here.</p>
+
+</a>Generate the SSH keys:</h4>
+<div class="highlight highlight-source-shell"><pre>$ mkdir -p config/jwt
+$ openssl genpkey -out config/jwt/private.pem -aes256 -algorithm rsa -pkeyopt rsa_keygen_bits:4096
+$ openssl pkey -in config/jwt/private.pem -out config/jwt/public.pem -pubout</pre></div>
+
 <p>Configure the SSH keys path in your <code>config/packages/lexik_jwt_authentication.yaml</code> :</p>
 <div class="highlight highlight-source-yaml"><pre><span class="pl-ent">lexik_jwt_authentication</span>:
     <span class="pl-ent">secret_key</span>:       <span class="pl-s"><span class="pl-pds">'</span>%kernel.project_dir%/config/jwt/private.pem<span class="pl-pds">'</span></span> <span class="pl-c"><span class="pl-c">#</span> required for token creation</span>
@@ -127,10 +133,10 @@ Then consult the documentation at this URL <a href="http://localhost:8000/swagge
 <p>You can access to the administrator apis with this credentials:</p>
 <ul>
     <li>username: admin</li>
-    <li>password: admin</li>
+    <li>password: password</li>
 </ul>
 <p>You can access to the user apis with this credentials:</p>
 <ul>
     <li>username: customer</li>
-    <li>password: customer</li>
+    <li>password: password</li>
 </ul>
