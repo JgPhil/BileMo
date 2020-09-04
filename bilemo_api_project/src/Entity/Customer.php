@@ -20,8 +20,8 @@ use Hateoas\Configuration\Annotation as Hateoas;
  * @Hateoas\Relation(
  *      "self",
  *      href = @Hateoas\Route(
- *          "show_user",
- *          parameters = { "id" = "expr(object.getId())" },
+ *          "show_customer",
+ *          parameters = { "username" = "expr(object.getUsername())" },
  *          absolute=true
  *      )
  * )
@@ -34,6 +34,8 @@ use Hateoas\Configuration\Annotation as Hateoas;
  *      )
  * )
  * 
+ * @Serializer\ExclusionPolicy("ALL")
+ * 
  */
 class Customer implements UserInterface
 {
@@ -44,7 +46,7 @@ class Customer implements UserInterface
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      * 
-     * @Serializer\Groups({"detail_customer", "list_customer"})
+     * @Serializer\Expose
      */
     private $id;
 
@@ -53,7 +55,7 @@ class Customer implements UserInterface
      * @OA\Property(type="string")
      * @ORM\Column(type="string", length=255)
      * 
-     * @Serializer\Groups({"detail_customer", "list_customer"})
+     * @Serializer\Expose
      */
     private $username;
 
@@ -62,7 +64,7 @@ class Customer implements UserInterface
      * @OA\Property(type="string")
      * @ORM\Column(type="string", length=255)
      * 
-     * @Serializer\Groups({"detail_customer", "list_customer"})
+     * @Serializer\Expose
      */
     private $email;
 
@@ -71,7 +73,7 @@ class Customer implements UserInterface
      * @OA\Property(type="string", format="date-time")
      * @ORM\Column(type="datetime")
      * 
-     * @Serializer\Groups({"detail_customer", "list_customer"})
+     * @Serializer\Expose
      */
     private $createdAt;
 
@@ -79,7 +81,7 @@ class Customer implements UserInterface
      * @OA\Property(type="object")
      * @var ArrayCollection
      * @ORM\OneToMany(targetEntity=User::class, mappedBy="customer", orphanRemoval=true)
-     * @Serializer\Groups({"detail_customer", "list_customer"})
+     * 
      */
     private $users;
 
