@@ -6,8 +6,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use OpenApi\Annotations as OA;
-
 
 /**
  * @Route("/api/v1")
@@ -15,31 +13,6 @@ use OpenApi\Annotations as OA;
 class SecurityController extends AbstractController
 {
     /**
-     * @OA\Post(
-     *      path="/login",
-     *      tags={"Security"},
-     *      @OA\RequestBody(
-     *    		@OA\MediaType(
-     *    			mediaType="application/json",
-     *    			@OA\Schema(
-     *    				 @OA\Property(property="username",
-     *    					type="string",
-     *    					example="",
-     *    					description=""
-     *    				),
-     *    				 @OA\Property(property="password",
-     *    					type="string",
-     *    					example="",
-     *    					description=""
-     *    				)
-     *    			),
-     *    		),
-     *    	),
-     *      @OA\Response(
-     *          response=204,
-     *          description="Authentication success")
-     * )
-     * 
      * @Route("/login", name="login", methods={"POST"})
      */
     public function login()

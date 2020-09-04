@@ -20,7 +20,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 
@@ -31,19 +30,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 class PhoneController extends AbstractController
 {
     /**
-     * @OA\Get(
-     *      path="/phones/{id}",
-     *      security={"bearer"},
-     *      tags={"Phones"},
-     *          @OA\Parameter(ref="#/components/parameters/id"),
-     *      @OA\Response(
-     *         response="200",
-     *         description="Shows a Phone",
-     *         @OA\JsonContent(ref="#/components/schemas/Phone"),
-     *      ),
-     *      @OA\Response(response="404",ref="#/components/responses/NotFound")
-     * )
-     * 
      * @Route("/phones/{id}", name="show_phone", methods={"GET"})
      */
     public function show($id, PhoneRepository $phoneRepository)
@@ -61,17 +47,6 @@ class PhoneController extends AbstractController
     }
 
     /**
-     * @OA\Get(
-     *      path="/phones",
-     *      security={"bearer"},
-     *      tags={"Phones"},
-     *      @OA\Parameter(ref="#/components/parameters/page"),
-     *      @OA\Response(
-     *          response="200",
-     *          description="List of phones",
-     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Phone"))
-     *      )
-     * )
      * @Route("/phones/{page<\d+>?1}", name="list_phone", methods={"GET"})
      */
     public function index(Request $request, PhoneRepository $phoneRepository)
@@ -92,18 +67,6 @@ class PhoneController extends AbstractController
     }
 
     /**
-     * @OA\Post(
-     *      path="/phones",
-     *      security={"bearer"},
-     *      tags={"Phones"},
-     *      @OA\Response(
-     *          response="201",
-     *          description="New phone ressource created",
-     *          @OA\JsonContent(@OA\Property(property="message", type="string", example="New phone ressource created"))
-     *       ),
-     *      @OA\Response(response="400",ref="#/components/responses/BadRequest")
-     * )
-     * 
      * @Route("/phones", name="add_phone", methods={"POST"})
      * @IsGranted("ROLE_ADMIN")
      */
@@ -127,19 +90,6 @@ class PhoneController extends AbstractController
 
 
     /**
-     * @OA\Put(
-     *      path="/phones/{id}",
-     *      security={"bearer"},
-     *      tags={"Phones"},
-     *      @OA\Parameter(ref="#/components/parameters/id"),
-     *      @OA\Response(
-     *          response="200",
-     *          description="Phone Update",
-     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Phone"))
-     *      ),
-     *      @OA\Response(response="400",ref="#/components/responses/BadRequest")
-     * )
-     * 
      * @Route("/phones/{id}", name="update_phone", methods={"PUT"})
      * @IsGranted("ROLE_ADMIN")
      */
@@ -175,18 +125,6 @@ class PhoneController extends AbstractController
 
 
     /**
-     * @OA\Delete(
-     *      path="/phones/{id}",
-     *      security={"bearer"},
-     *      tags={"Phones"},
-     *      @OA\Parameter(ref="#/components/parameters/id"),
-     *      @OA\Response(
-     *          response="204",
-     *          description="Delete a Phone"
-     *      ),
-     *      @OA\Response(response="403",ref="#/components/responses/Unauthorized")
-     * )
-     * 
      * @Route("/phones/{id}", name="delete_phone", methods={"DELETE"})
      * @IsGranted("ROLE_ADMIN")
      */
