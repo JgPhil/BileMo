@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use OpenApi\Annotations as OA;
-
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
  * @Route("/api/v1")
@@ -43,7 +43,12 @@ class SecurityController extends DefaultController
      * 
      * @Route("/login", name="login", methods={"POST"})
      */
-    public function login()
+    public function login() :JsonResponse
     {
+        $user = $this->getUser();
+        return new JsonResponse([
+            'username' => $user->getUserName(),
+            'roles' => $user->getRoles(),
+        ]);
     }
 }
