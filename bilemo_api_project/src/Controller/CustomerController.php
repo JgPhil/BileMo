@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Customer;
 use OpenApi\Annotations as OA;
 use App\Repository\CustomerRepository;
+use App\Controller\DefaultController;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,7 +20,7 @@ use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 /**
  * @Route("/api/v1")
  */
-class CustomerController extends AbstractController
+class CustomerController extends DefaultController
 {
 
     /**
@@ -42,7 +43,7 @@ class CustomerController extends AbstractController
         $user = $this->getUser();
 
         if ($user == $customer || $user->getRoles()[0] === 'ROLE_ADMIN') {
-            return $this->successResponse->setContent($serializer->serialize($user, 'json'));
+            return $this->successResponse->setContent($serializer->serialize($user, 'json'), $this->userListContext);
         } else {
             $data = [
                 'message' => 'Access denied'

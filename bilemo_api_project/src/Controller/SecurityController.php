@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Controller\DefaultController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -12,7 +13,7 @@ use OpenApi\Annotations as OA;
 /**
  * @Route("/api/v1")
  */
-class SecurityController extends AbstractController
+class SecurityController extends DefaultController
 {
     /**
      * @OA\Post(

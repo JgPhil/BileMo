@@ -7,6 +7,7 @@ use App\Entity\Phone;
 use App\Repository\PhoneRepository;
 use Doctrine\ORM\Mapping\Annotation;
 use App\Repository\CustomerRepository;
+use App\Controller\DefaultController;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,7 +29,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 /**
  * @Route("/api/v1")
  */
-class PhoneController extends AbstractController
+class PhoneController extends DefaultController
 {
     /**
      * @OA\Get(

@@ -11,10 +11,28 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use OpenApi\Annotations as OA;
 use JMS\Serializer\Annotation as Serializer;
 use JMS\Serializer\SerializationContext;
+use Hateoas\Configuration\Annotation as Hateoas;
 
 /**
  * @OA\Schema()
  * @ORM\Entity(repositoryClass=CustomerRepository::class)
+ * 
+ * @Hateoas\Relation(
+ *      "self",
+ *      href = @Hateoas\Route(
+ *          "show_user",
+ *          parameters = { "id" = "expr(object.getId())" },
+ *          absolute=true
+ *      )
+ * )
+ * 
+ * @Hateoas\Relation(
+ *      "list_users",
+ *      href = @Hateoas\Route(
+ *          "list_user",
+ *          absolute=true
+ *      )
+ * )
  * 
  */
 class Customer implements UserInterface
@@ -26,7 +44,7 @@ class Customer implements UserInterface
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      * 
-     * @Serializer\Groups({"detail", "list"})
+     * @Serializer\Groups({"detail_customer", "list_customer"})
      */
     private $id;
 
@@ -35,7 +53,7 @@ class Customer implements UserInterface
      * @OA\Property(type="string")
      * @ORM\Column(type="string", length=255)
      * 
-     * @Serializer\Groups({"detail", "list"})
+     * @Serializer\Groups({"detail_customer", "list_customer"})
      */
     private $username;
 
@@ -44,7 +62,7 @@ class Customer implements UserInterface
      * @OA\Property(type="string")
      * @ORM\Column(type="string", length=255)
      * 
-     * @Serializer\Groups({"detail", "list"})
+     * @Serializer\Groups({"detail_customer", "list_customer"})
      */
     private $email;
 
@@ -53,7 +71,7 @@ class Customer implements UserInterface
      * @OA\Property(type="string", format="date-time")
      * @ORM\Column(type="datetime")
      * 
-     * @Serializer\Groups({"detail", "list"})
+     * @Serializer\Groups({"detail_customer", "list_customer"})
      */
     private $createdAt;
 
@@ -61,7 +79,7 @@ class Customer implements UserInterface
      * @OA\Property(type="object")
      * @var ArrayCollection
      * @ORM\OneToMany(targetEntity=User::class, mappedBy="customer", orphanRemoval=true)
-     * 
+     * @Serializer\Groups({"detail_customer", "list_customer"})
      */
     private $users;
 

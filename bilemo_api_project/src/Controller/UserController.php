@@ -2,15 +2,17 @@
 
 namespace App\Controller;
 
-use App\Entity\Customer;
 use DateTime;
 use App\Entity\User;
-use App\Repository\CustomerRepository;
+use App\Entity\Customer;
+use OpenApi\Annotations as OA;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping\Annotation;
-use Doctrine\ORM\EntityManagerInterface;
-use Hateoas\Serializer\SerializerInterface as SerializerSerializerInterface;
+use App\Repository\CustomerRepository;
+use App\Controller\DefaultController;
 use JMS\Serializer\SerializerInterface;
+use Doctrine\ORM\EntityManagerInterface;
+use JMS\Serializer\SerializationContext;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,7 +23,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use OpenApi\Annotations as OA;
+use Hateoas\Serializer\SerializerInterface as SerializerSerializerInterface;
 
 
 
@@ -29,8 +31,9 @@ use OpenApi\Annotations as OA;
  * 
  * @Route("/api/v1")
  */
-class UserController extends AbstractController
+class UserController extends DefaultController
 {
+
     /**
      * @OA\Get(
      *      path="/users/{id}",
@@ -84,7 +87,7 @@ class UserController extends AbstractController
             $page = 1;
         }
         $users = $userRepository->findAllCustomerUsers($this->getUser(),$page,$this->getParameter('limit'))->getIterator();
-        return $this->successResponse->setContent($serializer->serialize($users, 'json', $this->listSerialisationContext));
+        return $this->successResponse->setContent($serializer->serialize($users, 'json'));
     }
 
     /**

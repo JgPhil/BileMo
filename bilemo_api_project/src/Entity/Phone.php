@@ -18,6 +18,8 @@ use JMS\Serializer\SerializationContext;
  * @OA\Schema()
  * @ORM\Entity(repositoryClass=PhoneRepository::class)
  * @UniqueEntity("name")
+ * 
+ * 
  */
 class Phone
 {
