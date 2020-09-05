@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use JMS\Serializer\SerializationContext;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -63,10 +64,32 @@ class DefaultController extends AbstractController
 
     public function __construct()
     {
-        $this->successResponse = new Response();
-        $this->successResponse->setStatusCode(200);
-        $this->successResponse->headers->set('Content-Type', 'application/json');
-        $this->successResponse->mustRevalidate();
-        $this->successResponse->setMaxAge(3600);
+        $this->successResponse = $this->cachedSuccessResponseFactory();
+    }
+
+    protected function updateUserData(User $user, $data)
+    {
+        foreach ($data as $key => $value) {
+            if ($key !== "id") {
+                if ($key === "createdAt" ) {
+                    $value = new \DateTime($value);
+                    $key = "createdAt";
+                }
+                $name = ucfirst($key);
+                $setter = 'set' . $name;
+                $user->$setter($value);
+            }
+        }
+        return $user;
+    }
+
+    private function cachedSuccessResponseFactory()
+    {
+        $response = new Response();
+        $response->setStatusCode(200);
+        $response->headers->set('Content-Type', 'application/json');
+        $response->mustRevalidate();
+        $response->setMaxAge(3600);
+        return $response;
     }
 }

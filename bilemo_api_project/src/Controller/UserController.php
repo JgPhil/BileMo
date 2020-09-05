@@ -86,7 +86,7 @@ class UserController extends DefaultController
         if (is_null($page) || $page < 1) {
             $page = 1;
         }
-        $users = $userRepository->findAllCustomerUsers($this->getUser(),$page,$this->getParameter('limit'))->getIterator();
+        $users = $userRepository->findAllCustomerUsers($this->getUser(), $page, $this->getParameter('limit'))->getIterator();
         return $this->successResponse->setContent($serializer->serialize($users, 'json'));
     }
 
@@ -149,34 +149,16 @@ class UserController extends DefaultController
     {
         if ($user->getCustomer() === $this->getUser()) {
             $data = json_decode($request->getContent());
-            foreach ($data as $key => $value) {
-                if ($key !== "id") {
-                    if ($key === "createdAt") {
-                        $value = new DateTime($value);
-                        $key = "createdAt";
-                    }
-                    $name = ucfirst($key);
-                    $setter = 'set' . $name;
-                    $user->$setter($value);
-                }
-            }
+            $user = $this->updateUserData($user, $data);
             $errors = $validator->validate($user);
             if (count($errors)) {
                 $errors = $serializer->serialize($errors, 'json');
-                return new Response($errors, 400, [
-                    'Content-Type' => 'application/json'
-                ]);
+                return new Response($errors, 400, ['Content-Type' => 'application/json']);
             }
             $entityManager->flush();
-            $data = [
-                'message' => 'L\'utilisateur a bien été mis à jour'
-            ];
-            return new JsonResponse($data);
+            return new JsonResponse($data = ['message' => 'L\'utilisateur a bien été mis à jour']);
         } else {
-            $data = [
-                'message' => 'Access denied'
-            ];
-            return $this->json($data, 403);
+            return $this->json($data = ['message' => 'Access denied'], 403);
         }
     }
 
