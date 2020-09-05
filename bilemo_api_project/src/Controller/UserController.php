@@ -51,19 +51,17 @@ class UserController extends DefaultController
      * 
      * @Route("/users/{id}", name="show_user", methods={"GET"})
      */
-    public function show($id, UserRepository $userRepository, SerializerInterface $serializer)
+    public function show($id, UserRepository $userRepository)
     {
         $user = $userRepository->find($id);
         if (!is_null($user)) {
             if ($user->getCustomer() === $this->getUser()) {
-                return $this->successResponse->setContent($serializer->serialize($user, 'json'));
+                return $this->successResponse->setContent($this->serializer->serialize($user, 'json'));
             } else {
-                $data = "Access denied";
-                return $this->json($data, 403);
+                return $this->json("Access denied", 403);
             }
         }
-        $data = "Ressource not found";
-        return $this->json($data, 404);
+        return $this->json("Ressource not found", 404);
     }
 
     /**
@@ -80,14 +78,14 @@ class UserController extends DefaultController
      * )
      * @Route("/users/{page<\d+>?1}", name="list_user", methods={"GET"})
      */
-    public function index(Request $request, UserRepository $userRepository, SerializerInterface $serializer)
+    public function index(Request $request, UserRepository $userRepository)
     {
         $page = $request->query->get('page');
         if (is_null($page) || $page < 1) {
             $page = 1;
         }
         $users = $userRepository->findAllCustomerUsers($this->getUser(), $page, $this->getParameter('limit'))->getIterator();
-        return $this->successResponse->setContent($serializer->serialize($users, 'json'));
+        return $this->successResponse->setContent($this->serializer->serialize($users, 'json'));
     }
 
     /**
@@ -105,26 +103,22 @@ class UserController extends DefaultController
      * 
      * @Route("/users", name="add_user", methods={"POST"})
      */
-    public function new(Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ValidatorInterface $validator, CustomerRepository $customerRepository)
+    public function new(Request $request)
     {
-        $data = $request->getContent();
-        $user = $serializer->deserialize($data, User::class, 'json');
-        $customer = $this->getUser();
+        $user = $this->serializer->deserialize($request->getContent(), User::class, 'json');
+        $customer = $this->getUser(); 
 
-        $errors = $validator->validate($user, [], ['groups' => 'user_read']);
+        $errors = $this->validator->validate($user, [], ['groups' => 'user_read']);
         if (count($errors)) {
-            $errors = $serializer->serialize($errors, 'json');
+            $errors = $this->serializer->serialize($errors, 'json');
             return new Response($errors, 400, [
                 'Content-Type' => 'application/json'
             ]);
         }
-        $entityManager->persist($user);
+        $this->entityManager->persist($user);
         $customer->addUser($user);
-        $entityManager->flush();
-        $data = [
-            'message' => 'L\'utilisateur a bien été ajouté'
-        ];
-        return $this->json($data, 201);
+        $this->entityManager->flush();
+        return $this->json(['message' => 'L\'utilisateur a bien été ajouté'], 201);
     }
 
 
@@ -145,17 +139,17 @@ class UserController extends DefaultController
      * 
      * @Route("/users/{id}", name="update_user", methods={"PUT"})
      */
-    public function update(Request $request, User $user, SerializerInterface $serializer, ValidatorInterface $validator, EntityManagerInterface $entityManager)
+    public function update(Request $request, User $user)
     {
         if ($user->getCustomer() === $this->getUser()) {
             $data = json_decode($request->getContent());
             $user = $this->updateUserData($user, $data);
-            $errors = $validator->validate($user);
+            $errors = $this->validator->validate($user);
             if (count($errors)) {
-                $errors = $serializer->serialize($errors, 'json');
+                $errors = $this->serializer->serialize($errors, 'json');
                 return new Response($errors, 400, ['Content-Type' => 'application/json']);
             }
-            $entityManager->flush();
+            $this->entitymanager->flush();
             return new JsonResponse($data = ['message' => 'L\'utilisateur a bien été mis à jour']);
         } else {
             return $this->json($data = ['message' => 'Access denied'], 403);
@@ -178,11 +172,11 @@ class UserController extends DefaultController
      * 
      * @Route("/users/{id}", name="delete_user", methods={"DELETE"})
      */
-    public function delete(User $user, EntityManagerInterface $entityManager)
+    public function delete(User $user)
     {
         if ($user->getCustomer() === $this->getUser()) {
-            $entityManager->remove($user);
-            $entityManager->flush();
+            $this->entityManager->remove($user);
+            $this->entityManager->flush();
             return new Response(null, 204);
         } else {
             $data = [

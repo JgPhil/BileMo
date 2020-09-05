@@ -3,12 +3,16 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use JMS\Serializer\SerializationContext;
+use JMS\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 
 use OpenApi\Annotations as Oa;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @OA\Parameter(
@@ -62,9 +66,18 @@ class DefaultController extends AbstractController
 
     protected $successResponse;
 
-    public function __construct()
+    protected $entityManager;
+
+    protected $validator;
+
+    protected $serializer;
+
+    public function __construct(EntityManagerInterface $entitymanager, ValidatorInterface $validator, SerializerInterface $serializer)
     {
         $this->successResponse = $this->cachedSuccessResponseFactory();
+        $this->entitymanager = $entitymanager;
+        $this->validator = $validator;
+        $this->serializer = $serializer;
     }
 
     protected function updateUserData(User $user, $data)
