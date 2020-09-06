@@ -80,10 +80,7 @@ class UserController extends DefaultController
      */
     public function index(Request $request, UserRepository $userRepository)
     {
-        $page = $request->query->get('page');
-        if (is_null($page) || $page < 1) {
-            $page = 1;
-        }
+        $page = $this->getPage($request);
         $users = $userRepository->findAllCustomerUsers($this->getUser(), $page, $this->getParameter('limit'))->getIterator();
         return $this->successResponse->setContent($this->serializer->serialize($users, 'json'));
     }
@@ -106,7 +103,7 @@ class UserController extends DefaultController
     public function new(Request $request)
     {
         $user = $this->serializer->deserialize($request->getContent(), User::class, 'json');
-        $customer = $this->getUser(); 
+        $customer = $this->getUser();
 
         $errors = $this->validator->validate($user, [], ['groups' => 'user_read']);
         if (count($errors)) {
@@ -143,16 +140,16 @@ class UserController extends DefaultController
     {
         if ($user->getCustomer() === $this->getUser()) {
             $data = json_decode($request->getContent());
-            $user = $this->updateUserData($user, $data);
+            $user = $this->updateUserData($user, $data); //DefaultController method with setters
             $errors = $this->validator->validate($user);
             if (count($errors)) {
                 $errors = $this->serializer->serialize($errors, 'json');
                 return new Response($errors, 400, ['Content-Type' => 'application/json']);
             }
-            $this->entitymanager->flush();
-            return new JsonResponse($data = ['message' => 'L\'utilisateur a bien été mis à jour']);
+            $this->entityManager->flush();
+            return new JsonResponse(['message' => 'L\'utilisateur a bien été mis à jour']);
         } else {
-            return $this->json($data = ['message' => 'Access denied'], 403);
+            return $this->json(['message' => 'Access denied'], 403);
         }
     }
 
@@ -179,10 +176,13 @@ class UserController extends DefaultController
             $this->entityManager->flush();
             return new Response(null, 204);
         } else {
-            $data = [
-                'message' => 'Access denied'
-            ];
-            return $this->json($data, 403);
+            return $this->json(['message' => 'Access denied'], 403);
         }
     }
+
+    private function updateUserData(User $user, $data)
+    {
+        return $user = $this->formatAndUpdate($user, $data);
+    }
+
 }

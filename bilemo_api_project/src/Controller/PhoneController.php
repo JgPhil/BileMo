@@ -47,16 +47,13 @@ class PhoneController extends DefaultController
      * 
      * @Route("/phones/{id}", name="show_phone", methods={"GET"})
      */
-    public function show($id, PhoneRepository $phoneRepository, SerializerInterface $serializer)
+    public function show($id, PhoneRepository $phoneRepository)
     {
         $phone = $phoneRepository->find($id);
-
-
         if (!is_null($phone)) {
-            return $this->successResponse->setContent($serializer->serialize($phone, 'json'));
+            return $this->successResponse->setContent($this->serializer->serialize($phone, 'json'));
         }
-        $data = "Ressource not found";
-        return $this->json($data, 404);
+        return $this->json(["message" => "Ressource not found"], 404);
     }
 
     /**
@@ -73,14 +70,11 @@ class PhoneController extends DefaultController
      * )
      * @Route("/phones/{page<\d+>?1}", name="list_phone", methods={"GET"})
      */
-    public function index(Request $request, PhoneRepository $phoneRepository, SerializerInterface $serializer)
+    public function index(Request $request, PhoneRepository $phoneRepository)
     {
-        $page = $request->query->get('page');
-        if (is_null($page) || $page < 1) {
-            $page = 1;
-        }
+        $page = $this->getPage($request);
         $phones = $phoneRepository->findAllPhones($page, $this->getParameter('limit'))->getIterator();
-        return $this->successResponse->setContent($serializer->serialize($phones, 'json'));
+        return $this->successResponse->setContent($this->serializer->serialize($phones, 'json'));
     }
 
     /**
@@ -99,22 +93,19 @@ class PhoneController extends DefaultController
      * @Route("/phones", name="add_phone", methods={"POST"})
      * @IsGranted("ROLE_ADMIN")
      */
-    public function new(Request $request, EntityManagerInterface $entityManager, SerializerInterface $serializer, ValidatorInterface $validator)
+    public function new(Request $request, EntityManagerInterface $entityManager)
     {
-        $phone = $serializer->deserialize($request->getContent(), Phone::class, 'json');
-        $errors = $validator->validate($phone);
+        $phone = $this->serializer->deserialize($request->getContent(), Phone::class, 'json');
+        $errors = $this->validator->validate($phone);
         if (count($errors)) {
-            $errors = $serializer->serialize($errors, 'json');
+            $errors = $this->serializer->serialize($errors, 'json');
             return new Response($errors, 400, [
                 'Content-Type' => 'application/json'
             ]);
         }
         $entityManager->persist($phone);
         $entityManager->flush();
-        $data = [
-            'message' => 'Le téléphone a bien été ajouté'
-        ];
-        return $this->json($data, 201);
+        return $this->json(['message' => 'Le téléphone a bien été ajouté'], 201);
     }
 
 
@@ -133,36 +124,22 @@ class PhoneController extends DefaultController
      * )
      * 
      * @Route("/phones/{id}", name="update_phone", methods={"PUT"})
-     * @IsGranted("ROLE_ADMIN")
      */
-    public function update(Request $request, Phone $phone, ValidatorInterface $validator, SerializerInterface $serializer, EntityManagerInterface $entityManager)
+    public function update(Request $request, Phone $phone)
     {
-        $phoneUpdate = $entityManager->getRepository(Phone::class)->find($phone->getId());
+        $role = $this->getUser()->getRoles();
+        if ($role[0] !== 'ROLE_ADMIN') {
+            return $this->json(['message' => 'Access denied'], 403);
+        }
         $data = json_decode($request->getContent());
-        //Setters Construction
-        foreach ($data as $key => $value) {
-            if ($key !== "id") {                
-                if ($key === "releasedAt") {
-                    $value = new DateTime($value);
-                    $key = "ReleasedAt";
-                }
-                $name = ucfirst($key);
-                $setter = 'set' . $name;
-                $phoneUpdate->$setter($value);
-            }
-        }
-        $errors = $validator->validate($phoneUpdate);
+        $phone = $this->updatePhoneData($phone, $data); 
+        $errors = $this->validator->validate($phone);
         if (count($errors)) {
-            $errors = $serializer->serialize($errors, 'json');
-            return new Response($errors, 400, [
-                'Content-Type' => 'application/json'
-            ]);
+            $errors = $this->serializer->serialize($errors, 'json');
+            return new Response($errors, 400, ['Content-Type' => 'application/json']);
         }
-        $entityManager->flush();
-        $data = [
-            'message' => 'Le téléphone a bien été mis à jour'
-        ];
-        return new JsonResponse($data);
+        $this->entityManager->flush();
+        return new JsonResponse(['message' => 'Le téléphone a bien été mis à jour']);
     }
 
 
@@ -182,17 +159,20 @@ class PhoneController extends DefaultController
      * @Route("/phones/{id}", name="delete_phone", methods={"DELETE"})
      * @IsGranted("ROLE_ADMIN")
      */
-    public function delete(Phone $phone, EntityManagerInterface $entityManager)
+    public function delete(Phone $phone)
     {
         $role = $this->getUser()->getRoles();
         if ($role[0] !== 'ROLE_ADMIN') {
-            $data = [
-                'message' => 'Access denied'
-            ];
-            return $this->json($data, 403);
+            return $this->json(['message' => 'Access denied'], 403);
         }
-        $entityManager->remove($phone);
-        $entityManager->flush();
+        $this->entityManager->remove($phone);
+        $this->entityManager->flush();
         return new Response(null, 204);
+    }
+
+
+    private function updatePhoneData(Phone $phone, $data)
+    {
+        return $phone = $this->formatAndUpdate($phone, $data); //DefaultController method with setters
     }
 }

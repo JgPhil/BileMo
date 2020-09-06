@@ -47,7 +47,7 @@
         "/customers": {
             "get": {
                 "tags": [
-                    "Customers"
+                    "Admin"
                 ],
                 "operationId": "App\\Controller\\CustomerController::index",
                 "parameters": [
@@ -64,6 +64,45 @@
                                     "type": "array",
                                     "items": {
                                         "$ref": "#/components/schemas/Customer"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "$ref": "#/components/responses/Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "scalar": "bearer"
+                    }
+                ]
+            }
+        },
+        "/customers/{username]/users": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "operationId": "App\\Controller\\CustomerController::customerUserList",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/username"
+                    },
+                    {
+                        "$ref": "#/components/parameters/page"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of users ressource linked to a customer",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/User"
                                     }
                                 }
                             }

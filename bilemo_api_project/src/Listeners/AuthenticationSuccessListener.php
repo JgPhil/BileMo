@@ -2,11 +2,14 @@
 
 namespace App\Listeners;
 
+use JMS\Serializer\SerializerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\AuthenticationSuccessEvent;
 use Lexik\Bundle\JWTAuthenticationBundle\Response\JWTAuthenticationSuccessResponse;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class AuthenticationSuccessListener
 {
@@ -14,9 +17,15 @@ class AuthenticationSuccessListener
 
     private $cookieSecure = false;
 
-    public function __construct($ttl)
+    private $serializer;
+
+    private $normalizer;
+
+    public function __construct($ttl, SerializerInterface $serializer, NormalizerInterface $normalizer)
     {
         $this->jwtTokenTTL = $ttl;
+        $this->serializer = $serializer;
+        $this->normalizer = $normalizer;
     }
 
     /**
@@ -30,9 +39,9 @@ class AuthenticationSuccessListener
         /** @var JWTAuthenticationSuccessResponse $response */
         $response = $event->getResponse();
         $data = $event->getData();
-        $tokenJWT = $data['token'];/* 
-        unset($data['token']);
-        $event->setData($data); */
+        $tokenJWT = $data['token'];
+       /*  $data['user'] = $this->normalizer->normalize($event->getUser(), null,[AbstractNormalizer::IGNORED_ATTRIBUTES => ['password', 'salt', 'users', 'roles']]); */
+        $event->setData($data);
         $response->headers->setCookie(new Cookie('BEARER', $tokenJWT, (new \DateTime())
             ->add(new \DateInterval('PT' . $this->jwtTokenTTL . 'S')), '/', null, $this->cookieSecure));
         return $response;

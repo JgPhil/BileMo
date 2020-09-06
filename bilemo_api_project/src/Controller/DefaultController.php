@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\Phone;
 use App\Entity\User;
+use DateTime;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use JMS\Serializer\SerializationContext;
@@ -12,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 
 use OpenApi\Annotations as Oa;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -72,28 +75,35 @@ class DefaultController extends AbstractController
 
     protected $serializer;
 
-    public function __construct(EntityManagerInterface $entitymanager, ValidatorInterface $validator, SerializerInterface $serializer)
+    public function __construct(EntityManagerInterface $entityManager, ValidatorInterface $validator, SerializerInterface $serializer)
     {
         $this->successResponse = $this->cachedSuccessResponseFactory();
-        $this->entitymanager = $entitymanager;
+        $this->entityManager = $entityManager;
         $this->validator = $validator;
         $this->serializer = $serializer;
+    }    
+
+    protected function getPage(Request $request)
+    {
+        $page = $request->query->get('page');
+        if (is_null($page) || $page < 1) {
+            $page = 1;
+        }
+        return $page;
     }
 
-    protected function updateUserData(User $user, $data)
+    protected function formatAndUpdate(object $entity, $data)
     {
         foreach ($data as $key => $value) {
             if ($key !== "id") {
-                if ($key === "createdAt" ) {
+                if ($key === 'createdAt' || $key ==='releasedAt') {
                     $value = new \DateTime($value);
-                    $key = "createdAt";
                 }
-                $name = ucfirst($key);
-                $setter = 'set' . $name;
-                $user->$setter($value);
+                $setter = "set" . ucfirst($key);
+                $entity->$setter($value);
             }
         }
-        return $user;
+        return $entity;
     }
 
     private function cachedSuccessResponseFactory()

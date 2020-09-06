@@ -6,6 +6,7 @@ use App\Entity\Customer;
 use OpenApi\Annotations as OA;
 use App\Repository\CustomerRepository;
 use App\Controller\DefaultController;
+use App\Repository\UserRepository;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,17 +39,14 @@ class CustomerController extends DefaultController
      * )
      * @Route("/customers/{username}", name="show_customer", methods={"GET"})
      */
-    public function show(Customer $customer, SerializerInterface $serializer)
+    public function show(Customer $customer)
     {
         $user = $this->getUser();
 
         if ($user == $customer || $user->getRoles()[0] === 'ROLE_ADMIN') {
-            return $this->successResponse->setContent($serializer->serialize($user, 'json'), $this->userListContext);
+            return $this->successResponse->setContent($this->serializer->serialize($user, 'json'));
         } else {
-            $data = [
-                'message' => 'Access denied'
-            ];
-            return $this->json($data, 403);
+            return $this->json(['message' => 'Access denied'], 403);
         }
     }
 
@@ -56,7 +54,7 @@ class CustomerController extends DefaultController
      * @OA\Get(
      *      path="/customers",
      *      security={"bearer"},
-     *      tags={"Customers"},
+     *      tags={"Admin"},
      *      @OA\Parameter(ref="#/components/parameters/page"),
      *      @OA\Response(
      *          response="200",
@@ -66,22 +64,45 @@ class CustomerController extends DefaultController
      *      @OA\Response(response="403",ref="#/components/responses/Unauthorized")
      * )
      * @Route("/customers/{page<\d+>?1}", name="list_customers", methods={"GET"})
-     * @IsGranted("ROLE_ADMIN")
      */
-    public function index(Request $request, CustomerRepository $repo, SerializerInterface $serializer)
+    public function index(Request $request, CustomerRepository $repo)
     {
         $role = $this->getUser()->getRoles();
         if ($role[0] !== 'ROLE_ADMIN') {
-            $data = [
-                'message' => 'Access denied'
-            ];
-            return $this->json($data, 403);
+            return $this->json(['message' => 'Access denied'], 403);
         }
-        $page = $request->query->get('page');
-        if (is_null($page) || $page < 1) {
-            $page = 1;
-        }
+        $page = $this->getPage($request);
         $customers = $repo->findAllCustomers($page, $this->getParameter('limit'))->getIterator();
-        return $this->successResponse->setContent($serializer->serialize($customers, 'json', $this->listSerialisationContext));
+        return $this->successResponse->setContent($this->serializer->serialize($customers, 'json'));
     }
+
+    /**
+     * @OA\Get(
+     *      path="/customers/{username]/users",
+     *      security={"bearer"},
+     *      tags={"Admin"},
+     *      @OA\Parameter(ref="#/components/parameters/username"),
+     *      @OA\Parameter(ref="#/components/parameters/page"),
+     *      @OA\Response(
+     *          response="200",
+     *          description="List of users ressource linked to a customer",
+     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/User"))
+     *      ),
+     *      @OA\Response(response="403",ref="#/components/responses/Unauthorized")
+     * )
+     * 
+     * @Route("/customers/{username}/users{page<\d+>?1}", name="list_customer_users", methods={"GET"})
+     */
+    public function customerUserList(Request $request, Customer $customer, UserRepository $repo)
+    {
+        $role = $this->getUser()->getRoles();
+        if ($role[0] !== 'ROLE_ADMIN') {
+            return $this->json(['message' => 'Access denied'], 403);
+        }
+        $page = $this->getPage($request);
+        $users = $repo->findAllCustomerUsers($customer, $page, $this->getParameter('limit'))->getIterator();
+        return $this->successResponse->setContent($this->serializer->serialize($users, 'json'));
+    }
+
+
 }
