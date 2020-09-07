@@ -2,20 +2,18 @@
 
 namespace App\Controller;
 
-use App\Entity\Phone;
-use App\Entity\User;
 use DateTime;
+use App\Entity\User;
+use App\Entity\Phone;
+use OpenApi\Annotations as Oa;
 use Doctrine\ORM\EntityManager;
+use JMS\Serializer\SerializerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use JMS\Serializer\SerializationContext;
-use JMS\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validation;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-
-
-use OpenApi\Annotations as Oa;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @OA\Parameter(
@@ -65,25 +63,22 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class DefaultController extends AbstractController
 {
-
+    
 
     protected $successResponse;
 
     protected $entityManager;
 
-    protected $validator;
-
     protected $serializer;
 
-    public function __construct(EntityManagerInterface $entityManager, ValidatorInterface $validator, SerializerInterface $serializer)
+    public function __construct(EntityManagerInterface $entityManager, SerializerInterface $serializer)
     {
-        $this->successResponse = $this->cachedSuccessResponseFactory();
+        $this->successResponse = $this->successResponseWithCache();
         $this->entityManager = $entityManager;
-        $this->validator = $validator;
         $this->serializer = $serializer;
     }    
 
-    protected function getPage(Request $request)
+    protected function getPage(Request $request):int
     {
         $page = $request->query->get('page');
         if (is_null($page) || $page < 1) {
@@ -92,7 +87,7 @@ class DefaultController extends AbstractController
         return $page;
     }
 
-    protected function formatAndUpdate(object $entity, $data)
+    protected function formatAndUpdate(object $entity, $data):object
     {
         foreach ($data as $key => $value) {
             if ($key !== "id") {
@@ -106,7 +101,7 @@ class DefaultController extends AbstractController
         return $entity;
     }
 
-    private function cachedSuccessResponseFactory()
+    private function successResponseWithCache():response
     {
         $response = new Response();
         $response->setStatusCode(200);

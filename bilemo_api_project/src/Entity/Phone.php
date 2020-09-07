@@ -14,6 +14,7 @@ use JMS\Serializer\SerializationContext;
 
 
 
+
 /**
  * @OA\Schema()
  * @ORM\Entity(repositoryClass=PhoneRepository::class)
@@ -37,7 +38,7 @@ class Phone
      * @OA\Property(type="string")
      * @ORM\Column(name="name", type="string", length=255)
      * @Assert\NotBlank(message="Le champ ne doit pas être vide")
-     * @Assert\Length(min="2", minMessage="Ce champ doit contenir un minimum de {{ limit }} caractères", max="255", maxMessage="Ce champ doit contenir un maximum de {{ limit }} caractères")
+     * @Assert\Length(min=2, minMessage="Your name must be at least {{ min }} characters long, max=255, maxMessage="Your first name cannot be longer than {{ max }} characters ")
      */
     private $name;
 
@@ -55,9 +56,9 @@ class Phone
      * @var int
      * @OA\Property(type="integer")
      * @ORM\Column(type="string", length=255)
-     * @Assert\Range(min="0", max="1500")
+     * @Assert\Positive
      * @Assert\NotBlank(message="Ce champ ne doit pas être vide")
-     * @Assert\Range(min="0", minMessage="La valeur minimum autorisée est {{ limit }}", max="1500", maxMessage="La valeur maximum autorisée est {{ limit }}")
+     * @Assert\Range(min=1, minMessage="The minimum value accepted is {{ min }}", max=1500, maxMessage="The maximum value accepted is {{ max }}")
      */
     private $price;
 
@@ -73,6 +74,7 @@ class Phone
      * @var \DateTimeInterface
      * @OA\Property(type="string", format="date-time")
      * @ORM\Column(type="datetime")
+     * @Serializer\Type("DateTime<'Y-m-d\TH:i:s.uT'>")
      */
     private $releasedAt;
 

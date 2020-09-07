@@ -100,12 +100,11 @@ class UserController extends DefaultController
      * 
      * @Route("/users", name="add_user", methods={"POST"})
      */
-    public function new(Request $request)
+    public function new(Request $request, ValidatorInterface $validator)
     {
         $user = $this->serializer->deserialize($request->getContent(), User::class, 'json');
         $customer = $this->getUser();
-
-        $errors = $this->validator->validate($user, [], ['groups' => 'user_read']);
+        $errors = $validator->validate($user);
         if (count($errors)) {
             $errors = $this->serializer->serialize($errors, 'json');
             return new Response($errors, 400, [
@@ -136,12 +135,12 @@ class UserController extends DefaultController
      * 
      * @Route("/users/{id}", name="update_user", methods={"PUT"})
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, User $user, ValidatorInterface $validator)
     {
         if ($user->getCustomer() === $this->getUser()) {
             $data = json_decode($request->getContent());
             $user = $this->updateUserData($user, $data); //DefaultController method with setters
-            $errors = $this->validator->validate($user);
+            $errors = $validator->validate($user);
             if (count($errors)) {
                 $errors = $this->serializer->serialize($errors, 'json');
                 return new Response($errors, 400, ['Content-Type' => 'application/json']);

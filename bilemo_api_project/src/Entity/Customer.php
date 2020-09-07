@@ -13,6 +13,7 @@ use JMS\Serializer\Annotation as Serializer;
 use JMS\Serializer\SerializationContext;
 use Hateoas\Configuration\Annotation as Hateoas;
 
+
 /**
  * @OA\Schema()
  * @ORM\Entity(repositoryClass=CustomerRepository::class)

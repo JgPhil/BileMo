@@ -93,10 +93,10 @@ class PhoneController extends DefaultController
      * @Route("/phones", name="add_phone", methods={"POST"})
      * @IsGranted("ROLE_ADMIN")
      */
-    public function new(Request $request, EntityManagerInterface $entityManager)
+    public function new(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator)
     {
         $phone = $this->serializer->deserialize($request->getContent(), Phone::class, 'json');
-        $errors = $this->validator->validate($phone);
+        $errors = $validator->validate($phone);
         if (count($errors)) {
             $errors = $this->serializer->serialize($errors, 'json');
             return new Response($errors, 400, [
@@ -125,7 +125,7 @@ class PhoneController extends DefaultController
      * 
      * @Route("/phones/{id}", name="update_phone", methods={"PUT"})
      */
-    public function update(Request $request, Phone $phone)
+    public function update(Request $request, Phone $phone, ValidatorInterface $validator)
     {
         $role = $this->getUser()->getRoles();
         if ($role[0] !== 'ROLE_ADMIN') {
@@ -133,7 +133,7 @@ class PhoneController extends DefaultController
         }
         $data = json_decode($request->getContent());
         $phone = $this->updatePhoneData($phone, $data); 
-        $errors = $this->validator->validate($phone);
+        $errors = $validator->validate($phone);
         if (count($errors)) {
             $errors = $this->serializer->serialize($errors, 'json');
             return new Response($errors, 400, ['Content-Type' => 'application/json']);

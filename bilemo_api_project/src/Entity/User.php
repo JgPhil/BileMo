@@ -6,12 +6,12 @@ use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
 use DateTimeInterface;
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use JMS\Serializer\Annotation as Serializer;
 use JMS\Serializer\SerializationContext;
 use OpenApi\Annotations as OA;
 use Hateoas\Configuration\Annotation as Hateoas;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @OA\Schema()
@@ -59,6 +59,9 @@ class User
      * @OA\Property(type="string")
      * @ORM\Column(type="string", length=255)
      * @Serializer\Expose
+     * 
+     * @Assert\NotBlank()
+     * @Assert\Length(min=2, minMessage="Your first name must be at least {{ min }} characters long", max=255, maxMessage="Your first name cannot be longer than {{ max }} characters ")
      */
     private $firstName;
 
@@ -67,6 +70,9 @@ class User
      * @OA\Property(type="string")
      * @ORM\Column(type="string", length=255)
      * @Serializer\Expose
+     * 
+     * @Assert\NotBlank()
+     * @Assert\Length(min=2, minMessage="Your last name must be at least {{ min }} characters long", max=255, maxMessage="Your first name cannot be longer than {{ max }} characters ")
      */
     private $lastName;
 
@@ -75,6 +81,7 @@ class User
      * @OA\Property(type="string")
      * @ORM\Column(type="string", length=255)
      * @Serializer\Expose
+     * @Assert\Email(message = "The email '{{ value }}' is not a valid email.")
      */
     private $email;
 
@@ -83,6 +90,7 @@ class User
      * @OA\Property(type="string", format="date-time")
      * @ORM\Column(type="datetime")
      * @Serializer\Expose
+     * @Serializer\Type("DateTime<'Y-m-d\TH:i:s.uT'>")
      */
     private $createdAt;
 
