@@ -139,7 +139,7 @@ class UserController extends DefaultController
     {
         if ($user->getCustomer() === $this->getUser()) {
             $data = json_decode($request->getContent());
-            $user = $this->updateUserData($user, $data); //DefaultController method with setters
+            $user = $this->updateUserData($user, $data);
             $errors = $validator->validate($user);
             if (count($errors)) {
                 $errors = $this->serializer->serialize($errors, 'json');
@@ -179,7 +179,7 @@ class UserController extends DefaultController
         }
     }
 
-    private function updateUserData(User $user, $data)
+    private function updateUserData(User $user, $data): User
     {
         return $user = $this->formatAndUpdate($user, $data);
     }

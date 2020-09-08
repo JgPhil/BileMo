@@ -171,7 +171,7 @@ class PhoneController extends DefaultController
     }
 
 
-    private function updatePhoneData(Phone $phone, $data)
+    private function updatePhoneData(Phone $phone, $data):Phone
     {
         return $phone = $this->formatAndUpdate($phone, $data); //DefaultController method with setters
     }
