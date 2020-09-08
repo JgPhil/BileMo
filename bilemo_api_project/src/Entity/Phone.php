@@ -37,8 +37,8 @@ class Phone
      * @var string
      * @OA\Property(type="string")
      * @ORM\Column(name="name", type="string", length=255)
-     * @Assert\NotBlank(message="Le champ ne doit pas être vide")
-     * @Assert\Length(min=2, minMessage="Your name must be at least {{ min }} characters long, max=255, maxMessage="Your first name cannot be longer than {{ max }} characters ")
+     * @Assert\NotBlank
+     * @Assert\Length(min=2, minMessage="Your name must be at least {{ min }} characters long", max=255, maxMessage="Your first name cannot be longer than {{ max }} characters ")
      */
     private $name;
 
@@ -47,7 +47,7 @@ class Phone
      * @OA\Property(type="string")
      * @Groups("phone_test")
      * @ORM\Column(type="string", length=255)
-     * @Assert\NotBlank(message="Le champ ne doit pas être vide")
+     * @Assert\NotBlank
      */
     private $description;
 
@@ -57,7 +57,7 @@ class Phone
      * @OA\Property(type="integer")
      * @ORM\Column(type="string", length=255)
      * @Assert\Positive
-     * @Assert\NotBlank(message="Ce champ ne doit pas être vide")
+     * @Assert\NotBlank
      * @Assert\Range(min=1, minMessage="The minimum value accepted is {{ min }}", max=1500, maxMessage="The maximum value accepted is {{ max }}")
      */
     private $price;
