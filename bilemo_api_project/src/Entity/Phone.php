@@ -38,7 +38,7 @@ class Phone
      * @OA\Property(type="string")
      * @ORM\Column(name="name", type="string", length=255)
      * @Assert\NotBlank(message="Le champ ne doit pas être vide")
-     * @Assert\Length(min=2, minMessage="Your name must be at least {{ min }} characters long, max=255, maxMessage="Your first name cannot be longer than {{ max }} characters ")
+     * @Assert\Length(min=2, minMessage="Your name must be at least {{ min }} characters long", max=255, maxMessage="Your first name cannot be longer than {{ max }} characters")
      */
     private $name;
 

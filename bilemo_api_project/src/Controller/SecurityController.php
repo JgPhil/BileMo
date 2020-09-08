@@ -46,7 +46,7 @@ class SecurityController extends DefaultController
     public function login() :JsonResponse
     {
         $user = $this->getUser();
-        return new JsonResponse([
+        return $this->json([
             'username' => $user->getUserName(),
             'roles' => $user->getRoles(),
         ]);

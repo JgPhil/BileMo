@@ -4,12 +4,3 @@ lexik_jwt_authentication:
     pass_phrase: '%env(JWT_PASSPHRASE)%'
     token_ttl: 3600
     user_identity_field: username
-
-    token_extractors:
-        authorization_header:
-            enabled: false
-            prefix: Bearer
-            name: authorization
-        cookie:
-            enabled: true
-            name: BEARER

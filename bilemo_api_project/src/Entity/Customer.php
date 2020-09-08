@@ -98,6 +98,11 @@ class Customer implements UserInterface
 
     private $salt;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $apiToken;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -210,5 +215,17 @@ class Customer implements UserInterface
 
     public function eraseCredentials()
     {
+    }
+
+    public function getApiToken(): ?string
+    {
+        return $this->apiToken;
+    }
+
+    public function setApiToken(?string $apiToken): self
+    {
+        $this->apiToken = $apiToken;
+
+        return $this;
     }
 }
