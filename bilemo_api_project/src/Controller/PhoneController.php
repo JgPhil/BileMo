@@ -8,6 +8,8 @@ use App\Repository\PhoneRepository;
 use Doctrine\ORM\Mapping\Annotation;
 use App\Repository\CustomerRepository;
 use App\Controller\DefaultController;
+use App\Service\HTTPCacheControl;
+use App\Service\PageFetcher;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Request;
@@ -51,7 +53,7 @@ class PhoneController extends DefaultController
     {
         $phone = $phoneRepository->find($id);
         if (!is_null($phone)) {
-            return $this->successResponse->setContent($this->serializer->serialize($phone, 'json'));
+            return $this->HTTPCacheControl->successResponseWithCache()->setContent($this->serializer->serialize($phone, 'json'));
         }
         return $this->json(["message" => "Ressource not found"], 404);
     }
@@ -72,9 +74,9 @@ class PhoneController extends DefaultController
      */
     public function index(Request $request, PhoneRepository $phoneRepository)
     {
-        $page = $this->getPage($request);
-        $phones = $phoneRepository->findAllPhones($page, $this->getParameter('limit'))->getIterator();
-        return $this->successResponse->setContent($this->serializer->serialize($phones, 'json'));
+        
+        $phones = $phoneRepository->findAllPhones($this->pageFetcher->getPage($request), $this->getParameter('limit'))->getIterator();
+        return $this->HTTPCacheControl->successResponseWithCache()->setContent($this->serializer->serialize($phones, 'json'));
     }
 
     /**
@@ -105,7 +107,7 @@ class PhoneController extends DefaultController
         }
         $entityManager->persist($phone);
         $entityManager->flush();
-        return $this->json(['message' => 'Le téléphone a bien été ajouté'], 201);
+        return $this->json($phone, 201);
     }
 
 
@@ -139,7 +141,7 @@ class PhoneController extends DefaultController
             return new Response($errors, 400, ['Content-Type' => 'application/json']);
         }
         $this->entityManager->flush();
-        return new JsonResponse(['message' => 'Le téléphone a bien été mis à jour']);
+        return $this->json($phone);
     }
 
 

@@ -5,6 +5,8 @@ namespace App\Controller;
 use DateTime;
 use App\Entity\User;
 use App\Entity\Phone;
+use App\Service\HTTPCacheControl;
+use App\Service\PageFetcher;
 use OpenApi\Annotations as Oa;
 use Doctrine\ORM\EntityManager;
 use JMS\Serializer\SerializerInterface;
@@ -63,7 +65,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  */
 class DefaultController extends AbstractController
 {
-    
+    protected $HTTPCacheControl;
+
+    protected $pageFetcher;
 
     protected $successResponse;
 
@@ -73,6 +77,9 @@ class DefaultController extends AbstractController
 
     public function __construct(EntityManagerInterface $entityManager, SerializerInterface $serializer)
     {
+
+        $this->HTTPCacheControl = new HTTPCacheControl;
+        $this->pageFetcher = new PageFetcher;
         $this->successResponse = $this->successResponseWithCache();
         $this->entityManager = $entityManager;
         $this->serializer = $serializer;
@@ -106,6 +113,7 @@ class DefaultController extends AbstractController
         $response = new Response();
         $response->setStatusCode(200);
         $response->headers->set('Content-Type', 'application/json');
+        $response->setPublic();
         $response->mustRevalidate();
         $response->setMaxAge(3600);
         return $response;

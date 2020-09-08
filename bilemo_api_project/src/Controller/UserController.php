@@ -56,7 +56,7 @@ class UserController extends DefaultController
         $user = $userRepository->find($id);
         if (!is_null($user)) {
             if ($user->getCustomer() === $this->getUser()) {
-                return $this->successResponse->setContent($this->serializer->serialize($user, 'json'));
+                return $this->HTTPCacheControl->successResponseWithCache()->setContent($this->serializer->serialize($user, 'json'));
             } else {
                 return $this->json("Access denied", 403);
             }
@@ -80,9 +80,8 @@ class UserController extends DefaultController
      */
     public function index(Request $request, UserRepository $userRepository)
     {
-        $page = $this->getPage($request);
-        $users = $userRepository->findAllCustomerUsers($this->getUser(), $page, $this->getParameter('limit'))->getIterator();
-        return $this->successResponse->setContent($this->serializer->serialize($users, 'json'));
+        $users = $userRepository->findAllCustomerUsers($this->getUser(), $this->pageFetcher->getPage($request), $this->getParameter('limit'))->getIterator();
+        return $this->HTTPCacheControl->successResponseWithCache()->setContent($this->serializer->serialize($users, 'json'));
     }
 
     /**
@@ -114,7 +113,7 @@ class UserController extends DefaultController
         $this->entityManager->persist($user);
         $customer->addUser($user);
         $this->entityManager->flush();
-        return $this->json(['message' => 'L\'utilisateur a bien été ajouté'], 201);
+        return $this->json($user, 201);
     }
 
 
@@ -146,7 +145,7 @@ class UserController extends DefaultController
                 return new Response($errors, 400, ['Content-Type' => 'application/json']);
             }
             $this->entityManager->flush();
-            return new JsonResponse(['message' => 'L\'utilisateur a bien été mis à jour']);
+            return $this->json($user);
         } else {
             return $this->json(['message' => 'Access denied'], 403);
         }
@@ -183,5 +182,4 @@ class UserController extends DefaultController
     {
         return $user = $this->formatAndUpdate($user, $data);
     }
-
 }

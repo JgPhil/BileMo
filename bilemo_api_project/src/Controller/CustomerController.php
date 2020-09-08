@@ -44,7 +44,7 @@ class CustomerController extends DefaultController
         $user = $this->getUser();
 
         if ($user == $customer || $user->getRoles()[0] === 'ROLE_ADMIN') {
-            return $this->successResponse->setContent($this->serializer->serialize($user, 'json'));
+            return $this->HTTPCacheControl->successResponseWithCache()->setContent($this->serializer->serialize($user, 'json'));
         } else {
             return $this->json(['message' => 'Access denied'], 403);
         }
@@ -73,7 +73,7 @@ class CustomerController extends DefaultController
         }
         $page = $this->getPage($request);
         $customers = $repo->findAllCustomers($page, $this->getParameter('limit'))->getIterator();
-        return $this->successResponse->setContent($this->serializer->serialize($customers, 'json'));
+        return $this->HTTPCacheControl->successResponseWithCache()->setContent($this->serializer->serialize($customers, 'json'));
     }
 
     /**
@@ -101,8 +101,7 @@ class CustomerController extends DefaultController
         }
         $page = $this->getPage($request);
         $users = $repo->findAllCustomerUsers($customer, $page, $this->getParameter('limit'))->getIterator();
-        return $this->successResponse->setContent($this->serializer->serialize($users, 'json'));
+        return $this->HTTPCacheControl->successResponseWithCache()->setContent($this->serializer->serialize($users, 'json'));
     }
-
-
+    
 }
