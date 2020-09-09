@@ -36,9 +36,10 @@ class UserController extends DefaultController
 
     /**
      * @OA\Get(
-     *      path="/users/{id}",
+     *      path="/customers/{username}/users/{id}",
      *      security={"bearer"},
      *      tags={"Users"},
+     *          @OA\Parameter(ref="#/components/parameters/username"),
      *          @OA\Parameter(ref="#/components/parameters/id"),
      *      @OA\Response(
      *         response="200",
@@ -49,14 +50,15 @@ class UserController extends DefaultController
      *      @OA\Response(response="404",ref="#/components/responses/NotFound"), 
      * ) 
      * 
-     * @Route("/users/{id}", name="show_user", methods={"GET"})
+     * @Route("/customers/{username}/users/{id}", name="show_user", methods={"GET"})
      */
-    public function show($id, UserRepository $userRepository)
+    public function show($username, $id, UserRepository $userRepository, CustomerRepository $customerRepository)
     {
         $user = $userRepository->find($id);
+        $customer = $customerRepository->findOneBy(['username' => $username]);
         if (!is_null($user)) {
-            if ($user->getCustomer() === $this->getUser()) {
-                return $this->requestManager->successResponseWithCache()->setContent($this->serializer->serialize($user, 'json'));
+            if ($customer === $this->getUser() || $this->getUser()->getRoles()[0] === 'ROLE_ADMIN') {
+                return $this->requestManager->successResponseWithCache(3600)->setContent($this->serializer->serialize($user, 'json'));
             } else {
                 return $this->json("Access denied", 403);
             }
@@ -66,9 +68,10 @@ class UserController extends DefaultController
 
     /**
      * @OA\Get(
-     *      path="/users",
+     *      path="/customers/{username}/users",
      *      security={"bearer"},
      *      tags={"Users"},
+     *      @OA\Parameter(ref="#/components/parameters/username"),
      *      @OA\Parameter(ref="#/components/parameters/page"),
      *      @OA\Response(
      *          response="200",
@@ -76,19 +79,20 @@ class UserController extends DefaultController
      *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/User"))
      *      )
      * )
-     * @Route("/users/{page<\d+>?1}", name="list_user", methods={"GET"})
+     * @Route("/customers/{username}/users/{page<\d+>?1}", name="list_user", methods={"GET"})
      */
     public function index(Request $request, UserRepository $userRepository)
     {
         $users = $userRepository->findAllCustomerUsers($this->getUser(), $this->requestManager->getPage($request), $this->getParameter('limit'))->getIterator();
-        return $this->requestManager->successResponseWithCache()->setContent($this->serializer->serialize($users, 'json'));
+        return $this->requestManager->successResponseWithCache(3600)->setContent($this->serializer->serialize($users, 'json'));
     }
 
     /**
      * @OA\Post(
-     *      path="/users",
+     *      path="/customers/{username}/users",
      *      security={"bearer"},
      *      tags={"Users"},
+     *      @OA\Parameter(ref="#/components/parameters/username"),
      *      @OA\Response(
      *          response="201",
      *          description="New user ressource created",
@@ -97,7 +101,7 @@ class UserController extends DefaultController
      *      @OA\Response(response="400",ref="#/components/responses/BadRequest")
      * )
      * 
-     * @Route("/users", name="add_user", methods={"POST"})
+     * @Route("/customers/{username}/users", name="add_user", methods={"POST"})
      */
     public function new(Request $request, ValidatorInterface $validator)
     {
@@ -113,15 +117,16 @@ class UserController extends DefaultController
         $this->entityManager->persist($user);
         $customer->addUser($user);
         $this->entityManager->flush();
-        return $this->json($user, 201);
+        return new Response($this->serializer->serialize($user, 'json'), 201);
     }
 
 
     /**
      * @OA\Put(
-     *      path="/users/{id}",
+     *      path="/customers/{username}/users/{id}",
      *      security={"bearer"},
      *      tags={"Users"},
+     *      @OA\Parameter(ref="#/components/parameters/username"),
      *      @OA\Parameter(ref="#/components/parameters/id"),
      *      @OA\Response(
      *          response="200",
@@ -132,11 +137,11 @@ class UserController extends DefaultController
      *      @OA\Response(response="400",ref="#/components/responses/BadRequest")
      * )
      * 
-     * @Route("/users/{id}", name="update_user", methods={"PUT"})
+     * @Route("/customers/{username}/users/{id}", name="update_user", methods={"PUT"})
      */
     public function update(Request $request, User $user, ValidatorInterface $validator)
     {
-        if ($user->getCustomer() === $this->getUser()) {
+        if ($user->getCustomer() === $this->getUser() || $this->getUser()->getRoles()[0] === 'ROLE_ADMIN') {
             $data = json_decode($request->getContent());
             $user = $this->updateUserData($user, $data);
             $errors = $validator->validate($user);
@@ -145,7 +150,7 @@ class UserController extends DefaultController
                 return new Response($errors, 400, ['Content-Type' => 'application/json']);
             }
             $this->entityManager->flush();
-            return $this->json($user);
+            return new Response($this->serializer->serialize($user, 'json'), 200, ['Content-Type' => 'application/json']);
         } else {
             return $this->json(['message' => 'Access denied'], 403);
         }
@@ -154,9 +159,10 @@ class UserController extends DefaultController
 
     /**
      * @OA\Delete(
-     *      path="/users/{id}",
+     *      path="/customers/{username}/users/{id}",
      *      security={"bearer"},
      *      tags={"Users"},
+     *      @OA\Parameter(ref="#/components/parameters/username"),
      *      @OA\Parameter(ref="#/components/parameters/id"),
      *      @OA\Response(
      *          response="204",
@@ -165,7 +171,7 @@ class UserController extends DefaultController
      *      @OA\Response(response="403",ref="#/components/responses/Unauthorized")
      * )
      * 
-     * @Route("/users/{id}", name="delete_user", methods={"DELETE"})
+     * @Route("/customers/{username}/users/{id}", name="delete_user", methods={"DELETE"})
      */
     public function delete(User $user)
     {

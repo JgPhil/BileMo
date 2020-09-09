@@ -80,45 +80,6 @@
                 ]
             }
         },
-        "/customers/{username]/users": {
-            "get": {
-                "tags": [
-                    "Admin"
-                ],
-                "operationId": "App\\Controller\\CustomerController::customerUserList",
-                "parameters": [
-                    {
-                        "$ref": "#/components/parameters/username"
-                    },
-                    {
-                        "$ref": "#/components/parameters/page"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of users ressource linked to a customer",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/User"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "$ref": "#/components/responses/Unauthorized"
-                    }
-                },
-                "security": [
-                    {
-                        "scalar": "bearer"
-                    }
-                ]
-            }
-        },
         "/phones/{id}": {
             "get": {
                 "tags": [
@@ -308,13 +269,16 @@
                 }
             }
         },
-        "/users/{id}": {
+        "/customers/{username}/users/{id}": {
             "get": {
                 "tags": [
                     "Users"
                 ],
                 "operationId": "App\\Controller\\UserController::show",
                 "parameters": [
+                    {
+                        "$ref": "#/components/parameters/username"
+                    },
                     {
                         "$ref": "#/components/parameters/id"
                     }
@@ -349,6 +313,9 @@
                 ],
                 "operationId": "App\\Controller\\UserController::update",
                 "parameters": [
+                    {
+                        "$ref": "#/components/parameters/username"
+                    },
                     {
                         "$ref": "#/components/parameters/id"
                     }
@@ -387,6 +354,9 @@
                 "operationId": "App\\Controller\\UserController::delete",
                 "parameters": [
                     {
+                        "$ref": "#/components/parameters/username"
+                    },
+                    {
                         "$ref": "#/components/parameters/id"
                     }
                 ],
@@ -405,13 +375,16 @@
                 ]
             }
         },
-        "/users": {
+        "/customers/{username}/users": {
             "get": {
                 "tags": [
                     "Users"
                 ],
                 "operationId": "App\\Controller\\UserController::index",
                 "parameters": [
+                    {
+                        "$ref": "#/components/parameters/username"
+                    },
                     {
                         "$ref": "#/components/parameters/page"
                     }
@@ -440,6 +413,11 @@
             "post": {
                 "tags": [
                     "Users"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/username"
+                    }
                 ],
                 "responses": {
                     "201": {

@@ -53,7 +53,7 @@ class PhoneController extends DefaultController
     {
         $phone = $phoneRepository->find($id);
         if (!is_null($phone)) {
-            return $this->requestManager->successResponseWithCache()->setContent($this->serializer->serialize($phone, 'json'));
+            return $this->requestManager->successResponseWithCache(3600)->setContent($this->serializer->serialize($phone, 'json'));
         }
         return $this->json(["message" => "Ressource not found"], 404);
     }
@@ -75,7 +75,7 @@ class PhoneController extends DefaultController
     public function index(Request $request, PhoneRepository $phoneRepository)
     {        
         $phones = $phoneRepository->findAllPhones($this->requestManager->getPage($request), $this->getParameter('limit'))->getIterator();
-        return $this->requestManager->successResponseWithCache()->setContent($this->serializer->serialize($phones, 'json'));
+        return $this->requestManager->successResponseWithCache(3600)->setContent($this->serializer->serialize($phones, 'json'));
     }
 
     /**
@@ -92,10 +92,13 @@ class PhoneController extends DefaultController
      * )
      * 
      * @Route("/phones", name="add_phone", methods={"POST"})
-     * @IsGranted("ROLE_ADMIN")
      */
     public function new(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator)
     {
+        if ($this->getUser()->getRoles()[0] !== 'ROLE_ADMIN')
+        {
+            return $this->json(['message' => 'Access denied'], 403);
+        }   
         $phone = $this->serializer->deserialize($request->getContent(), Phone::class, 'json');
         $errors = $validator->validate($phone);
         if (count($errors)) {

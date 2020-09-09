@@ -31,6 +31,7 @@ use Hateoas\Configuration\Annotation as Hateoas;
  *      "list_users",
  *      href = @Hateoas\Route(
  *          "list_user",
+ *          parameters = { "username" = "expr(object.getUsername())" },
  *          absolute=true
  *      )
  * )

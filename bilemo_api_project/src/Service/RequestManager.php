@@ -11,19 +11,25 @@ class RequestManager
 {
 
 
-    public function successResponseWithCache(): Response
+    public function successResponseWithCache($ttl): Response
     {
-        $successResponse = new Response();
-        $successResponse->setStatusCode(200);
-        $successResponse->headers->set('Content-Type', 'application/json');
-        return $this->setCache($this->successResponse);
+        $successResponse = $this->successResponseWithJsonType();        
+        return $this->setCache($successResponse, $ttl);
     }
 
-    public function setCache(Response $response): Response
+    public function successResponseWithJsonType()
+    {
+        $successResponse = new Response();
+        $successResponse->headers->set('Content-Type', 'application/json');
+        $successResponse->setStatusCode(200);
+        return $successResponse;
+    }
+
+    public function setCache(Response $response, $ttl): Response
     {
         $response->setPublic();
         $response->mustRevalidate();
-        $response->setMaxAge(3600);
+        $response->setMaxAge($ttl);
         return $response;
     }
 

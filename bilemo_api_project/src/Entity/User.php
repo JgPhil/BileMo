@@ -23,7 +23,10 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *      "self",
  *      href = @Hateoas\Route(
  *          "show_user",
- *          parameters = { "id" = "expr(object.getId())" },
+ *          parameters = { 
+ *              "id" = "expr(object.getId())",
+ *              "username" = "expr(object.getCustomer().getUsername())"
+*           },
  *          absolute=true
  *      )
  * )
