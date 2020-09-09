@@ -5,8 +5,10 @@ namespace App\Controller;
 use DateTime;
 use App\Entity\User;
 use App\Entity\Phone;
+use App\Service\EntityUpdater;
 use App\Service\HTTPCacheControl;
 use App\Service\PageFetcher;
+use App\Service\RequestManager;
 use OpenApi\Annotations as Oa;
 use Doctrine\ORM\EntityManager;
 use JMS\Serializer\SerializerInterface;
@@ -67,55 +69,20 @@ class DefaultController extends AbstractController
 {
     protected $HTTPCacheControl;
 
-    protected $pageFetcher;
-
-    protected $successResponse;
 
     protected $entityManager;
 
     protected $serializer;
 
-    public function __construct(EntityManagerInterface $entityManager, SerializerInterface $serializer)
-    {
+    protected $requestManager;
 
-        $this->HTTPCacheControl = new HTTPCacheControl;
-        $this->pageFetcher = new PageFetcher;
-        $this->successResponse = $this->successResponseWithCache();
-        $this->entityManager = $entityManager;
+    protected $entityUpdater;
+
+    public function __construct( EntityManagerInterface $entityManager, SerializerInterface $serializer)
+    {
+        $this->entityUpdater = new EntityUpdater;       // Service which handles Entity update on PUT requests
+        $this->requestManager = new RequestManager();   // Service which handles Cache-control && Request Parameters
+        $this->entityManager = $entityManager;  
         $this->serializer = $serializer;
-    }    
-
-    protected function getPage(Request $request):int
-    {
-        $page = $request->query->get('page');
-        if (is_null($page) || $page < 1) {
-            $page = 1;
-        }
-        return $page;
-    }
-
-    protected function formatAndUpdate(object $entity, $data):object
-    {
-        foreach ($data as $key => $value) {
-            if ($key !== "id") {
-                if ($key === 'createdAt' || $key ==='releasedAt') {
-                    $value = new \DateTime($value);
-                }
-                $setter = "set" . ucfirst($key);
-                $entity->$setter($value);
-            }
-        }
-        return $entity;
-    }
-
-    private function successResponseWithCache():response
-    {
-        $response = new Response();
-        $response->setStatusCode(200);
-        $response->headers->set('Content-Type', 'application/json');
-        $response->setPublic();
-        $response->mustRevalidate();
-        $response->setMaxAge(3600);
-        return $response;
-    }
+    }   
 }

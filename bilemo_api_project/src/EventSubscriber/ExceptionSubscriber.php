@@ -12,32 +12,24 @@ class ExceptionSubscriber implements EventSubscriberInterface
 {
     public function onKernelException(ExceptionEvent $event)
     {
+        // You get the exception object from the received event
+        $exception = $event->getThrowable();      
 
-        $response = new JsonResponse();
+        // Customize your response object to display the exception details
+        $response = new Response();
+        $response->setContent($exception->getMessage());
 
-        $exception = $event->getThrowable();
-
-         if ($exception instanceof HttpExceptionInterface) {
-            $data = [
-                'message' => $exception->getMessage()
-            ];
-            $response->setData($data);
+        // HttpExceptionInterface is a special type of exception that
+        // holds status code and header details
+        if ($exception instanceof HttpExceptionInterface) {
             $response->setStatusCode($exception->getStatusCode());
             $response->headers->replace($exception->getHeaders());
         } else {
-            $response->setStatusCode(Response::HTTP_BAD_REQUEST);
-            $response->setJson("");
-            $response->setData([
-                'message' => $exception->getMessage()
-            ]);
-        }  
+            $response->setContent($exception->getMessage().' in file: '.$exception->getFile());
+            $response->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
 
-        /* $response->setStatusCode(Response::HTTP_BAD_REQUEST);
-        $response->setJson("");
-        $response->setData([
-            'message' => "Bad Request"
-        ]); */
-
+        // sends the modified response object to the event
         $event->setResponse($response);
     }
 

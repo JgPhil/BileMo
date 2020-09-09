@@ -53,7 +53,7 @@ class PhoneController extends DefaultController
     {
         $phone = $phoneRepository->find($id);
         if (!is_null($phone)) {
-            return $this->HTTPCacheControl->successResponseWithCache()->setContent($this->serializer->serialize($phone, 'json'));
+            return $this->requestManager->successResponseWithCache()->setContent($this->serializer->serialize($phone, 'json'));
         }
         return $this->json(["message" => "Ressource not found"], 404);
     }
@@ -73,10 +73,9 @@ class PhoneController extends DefaultController
      * @Route("/phones/{page<\d+>?1}", name="list_phone", methods={"GET"})
      */
     public function index(Request $request, PhoneRepository $phoneRepository)
-    {
-        
-        $phones = $phoneRepository->findAllPhones($this->pageFetcher->getPage($request), $this->getParameter('limit'))->getIterator();
-        return $this->HTTPCacheControl->successResponseWithCache()->setContent($this->serializer->serialize($phones, 'json'));
+    {        
+        $phones = $phoneRepository->findAllPhones($this->requestManager->getPage($request), $this->getParameter('limit'))->getIterator();
+        return $this->requestManager->successResponseWithCache()->setContent($this->serializer->serialize($phones, 'json'));
     }
 
     /**
@@ -134,8 +133,7 @@ class PhoneController extends DefaultController
             return $this->json(['message' => 'Access denied'], 403);
         }
         $data = json_decode($request->getContent());
-        $phone = $this->updatePhoneData($phone, $data); 
-        $errors = $validator->validate($phone);
+        $errors = $validator->validate($this->updatePhoneData($phone, $data));
         if (count($errors)) {
             $errors = $this->serializer->serialize($errors, 'json');
             return new Response($errors, 400, ['Content-Type' => 'application/json']);
@@ -163,8 +161,7 @@ class PhoneController extends DefaultController
      */
     public function delete(Phone $phone)
     {
-        $role = $this->getUser()->getRoles();
-        if ($role[0] !== 'ROLE_ADMIN') {
+        if ($this->getUser()->getRoles()[0] !== 'ROLE_ADMIN') {
             return $this->json(['message' => 'Access denied'], 403);
         }
         $this->entityManager->remove($phone);
@@ -175,6 +172,6 @@ class PhoneController extends DefaultController
 
     private function updatePhoneData(Phone $phone, $data):Phone
     {
-        return $phone = $this->formatAndUpdate($phone, $data); //DefaultController method with setters
+        return $phone = $this->entityUpdater->formatAndUpdate($phone, $data);
     }
 }

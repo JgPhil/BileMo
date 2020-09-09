@@ -56,7 +56,7 @@ class UserController extends DefaultController
         $user = $userRepository->find($id);
         if (!is_null($user)) {
             if ($user->getCustomer() === $this->getUser()) {
-                return $this->HTTPCacheControl->successResponseWithCache()->setContent($this->serializer->serialize($user, 'json'));
+                return $this->requestManager->successResponseWithCache()->setContent($this->serializer->serialize($user, 'json'));
             } else {
                 return $this->json("Access denied", 403);
             }
@@ -80,8 +80,8 @@ class UserController extends DefaultController
      */
     public function index(Request $request, UserRepository $userRepository)
     {
-        $users = $userRepository->findAllCustomerUsers($this->getUser(), $this->pageFetcher->getPage($request), $this->getParameter('limit'))->getIterator();
-        return $this->HTTPCacheControl->successResponseWithCache()->setContent($this->serializer->serialize($users, 'json'));
+        $users = $userRepository->findAllCustomerUsers($this->getUser(), $this->requestManager->getPage($request), $this->getParameter('limit'))->getIterator();
+        return $this->requestManager->successResponseWithCache()->setContent($this->serializer->serialize($users, 'json'));
     }
 
     /**
@@ -180,6 +180,6 @@ class UserController extends DefaultController
 
     private function updateUserData(User $user, $data): User
     {
-        return $user = $this->formatAndUpdate($user, $data);
+        return $user = $this->entityUpdater->formatAndUpdate($user, $data);
     }
 }

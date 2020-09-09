@@ -42,9 +42,8 @@ class CustomerController extends DefaultController
     public function show(Customer $customer)
     {
         $user = $this->getUser();
-
-        if ($user == $customer || $user->getRoles()[0] === 'ROLE_ADMIN') {
-            return $this->HTTPCacheControl->successResponseWithCache()->setContent($this->serializer->serialize($user, 'json'));
+        if ($user === $customer || $user->getRoles()[0] === 'ROLE_ADMIN') {
+            return $this->requestManager->successResponseWithCache()->setContent($this->serializer->serialize($user, 'json'));
         } else {
             return $this->json(['message' => 'Access denied'], 403);
         }
@@ -71,9 +70,8 @@ class CustomerController extends DefaultController
         if ($role[0] !== 'ROLE_ADMIN') {
             return $this->json(['message' => 'Access denied'], 403);
         }
-        $page = $this->getPage($request);
-        $customers = $repo->findAllCustomers($page, $this->getParameter('limit'))->getIterator();
-        return $this->HTTPCacheControl->successResponseWithCache()->setContent($this->serializer->serialize($customers, 'json'));
+        $customers = $repo->findAllCustomers($this->requestManager->getPage($request), $this->getParameter('limit'))->getIterator();
+        return $this->requestManager->successResponseWithCache()->setContent($this->serializer->serialize($customers, 'json'));
     }
 
     /**
@@ -99,9 +97,7 @@ class CustomerController extends DefaultController
         if ($role[0] !== 'ROLE_ADMIN') {
             return $this->json(['message' => 'Access denied'], 403);
         }
-        $page = $this->getPage($request);
-        $users = $repo->findAllCustomerUsers($customer, $page, $this->getParameter('limit'))->getIterator();
-        return $this->HTTPCacheControl->successResponseWithCache()->setContent($this->serializer->serialize($users, 'json'));
+        $users = $repo->findAllCustomerUsers($customer, $this->requestManager->getPage($request), $this->getParameter('limit'))->getIterator();
+        return $this->requestManager->successResponseWithCache()->setContent($this->serializer->serialize($users, 'json'));
     }
-    
 }
