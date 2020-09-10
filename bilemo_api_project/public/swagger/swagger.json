@@ -467,6 +467,15 @@
                     },
                     "users": {
                         "type": "object"
+                    },
+                    "password": {
+                        "type": "string"
+                    },
+                    "roles": {
+                        "type": "json"
+                    },
+                    "phones": {
+                        "type": "object"
                     }
                 },
                 "type": "object"
@@ -491,6 +500,9 @@
                     "releasedAt": {
                         "type": "string",
                         "format": "date-time"
+                    },
+                    "customers": {
+                        "type": "object"
                     }
                 },
                 "type": "object"

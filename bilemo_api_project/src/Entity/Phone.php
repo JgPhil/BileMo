@@ -22,7 +22,7 @@ use JMS\Serializer\SerializationContext;
  * @ORM\Entity(repositoryClass=PhoneRepository::class)
  * @UniqueEntity("name")
  * 
- * 
+ * @Serializer\ExclusionPolicy("ALL")
  */
 class Phone
 {
@@ -32,6 +32,7 @@ class Phone
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Serializer\Expose
      */
     private $id;
 
@@ -41,6 +42,7 @@ class Phone
      * @ORM\Column(name="name", type="string", length=255)
      * @Assert\NotBlank
      * @Assert\Length(min=2, minMessage="Your name must be at least {{ min }} characters long", max=255, maxMessage="Your first name cannot be longer than {{ max }} characters ")
+     * @Serializer\Expose
      */
     private $name;
 
@@ -50,6 +52,7 @@ class Phone
      * @Groups("phone_test")
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank
+     * @Serializer\Expose
      */
     private $description;
 
@@ -61,6 +64,7 @@ class Phone
      * @Assert\Positive
      * @Assert\NotBlank
      * @Assert\Range(min=1, minMessage="The minimum value accepted is {{ min }}", max=1500, maxMessage="The maximum value accepted is {{ max }}")
+     * @Serializer\Expose
      */
     private $price;
 
@@ -69,6 +73,7 @@ class Phone
      * @OA\Property(type="string")
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank
+     * @Serializer\Expose
      */
     private $color;
 
@@ -77,10 +82,12 @@ class Phone
      * @OA\Property(type="string", format="date-time")
      * @ORM\Column(type="datetime")
      * @Serializer\Type("DateTime<'Y-m-d\TH:i:s.uT'>")
+     * @Serializer\Expose
      */
     private $releasedAt;
 
     /**
+     * @OA\Property(type="object")
      * @ORM\ManyToMany(targetEntity=Customer::class, mappedBy="phones")
      */
     private $customers;

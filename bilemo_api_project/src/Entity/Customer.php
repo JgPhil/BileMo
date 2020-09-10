@@ -36,6 +36,14 @@ use Hateoas\Configuration\Annotation as Hateoas;
  *      )
  * )
  * 
+ * @Hateoas\Relation(
+ *      "list_phones",
+ *      href = @Hateoas\Route(
+ *          "list_phone",
+ *          absolute=true
+ *      )
+ * )
+ * 
  * @Serializer\ExclusionPolicy("ALL")
  * 
  */
@@ -88,11 +96,13 @@ class Customer implements UserInterface
     private $users;
 
     /**
+     * @OA\Property(type="string")
      * @ORM\Column(type="string", length=255)
      */
     private $password;
 
     /**
+     * @OA\Property(type="json")
      * @ORM\Column(type="json")
      */
     private $roles = [];
@@ -100,6 +110,7 @@ class Customer implements UserInterface
     private $salt;
 
     /**
+     * @OA\Property(type="object")
      * @ORM\ManyToMany(targetEntity=Phone::class, inversedBy="customers")
      */
     private $phones;
