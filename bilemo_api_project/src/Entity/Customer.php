@@ -99,9 +99,16 @@ class Customer implements UserInterface
 
     private $salt;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Phone::class, inversedBy="customers")
+     */
+    private $phones;
+
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
+        $this->phones = new ArrayCollection();
     }
 
 
@@ -212,4 +219,31 @@ class Customer implements UserInterface
     public function eraseCredentials()
     {
     }
+
+    /**
+     * @return Collection|Phone[]
+     */
+    public function getPhones(): Collection
+    {
+        return $this->phones;
+    }
+
+    public function addPhone(Phone $phone): self
+    {
+        if (!$this->phones->contains($phone)) {
+            $this->phones[] = $phone;
+        }
+
+        return $this;
+    }
+
+    public function removePhone(Phone $phone): self
+    {
+        if ($this->phones->contains($phone)) {
+            $this->phones->removeElement($phone);
+        }
+
+        return $this;
+    }
+
 }

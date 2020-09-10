@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\PhoneRepository;
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -78,10 +80,16 @@ class Phone
      */
     private $releasedAt;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Customer::class, mappedBy="phones")
+     */
+    private $customers;
+
 
     public function __construct()
     {
         $this->releasedAt = new DateTime();
+        $this->customers = new ArrayCollection();
     }
 
 
@@ -147,6 +155,34 @@ class Phone
     public function setReleasedAt($releasedAt): self
     {
         $this->releasedAt = $releasedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Customer[]
+     */
+    public function getCustomers(): Collection
+    {
+        return $this->customers;
+    }
+
+    public function addCustomer(Customer $customer): self
+    {
+        if (!$this->customers->contains($customer)) {
+            $this->customers[] = $customer;
+            $customer->addPhone($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCustomer(Customer $customer): self
+    {
+        if ($this->customers->contains($customer)) {
+            $this->customers->removeElement($customer);
+            $customer->removePhone($this);
+        }
 
         return $this;
     }
