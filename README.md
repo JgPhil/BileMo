@@ -3,7 +3,7 @@
 
 
 <h1>Projet 7 Openclassrooms- BileMo</h1>
-    <p>BileMo Api developpement project
+    <p>BileMo Api developpement project 
              <a href="https://codeclimate.com/github/JgPhil/BileMo/maintainability"><img src="https://api.codeclimate.com/v1/badges/449883de8d8b0bc1c40a/maintainability" /></a>
     </p>
     <h2>Environment used during development</h2>
