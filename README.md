@@ -102,25 +102,25 @@ $ openssl pkey -in config/jwt/private.pem -out config/jwt/public.pem -pubout</pr
     <span class="pl-c"><span class="pl-c">#</span> ...</span>    
     <span class="pl-ent">firewalls</span>:
         <span class="pl-ent">login</span>:
-            <span class="pl-ent">pattern</span>:  <span class="pl-s">^/api/login</span>
+            <span class="pl-ent">pattern</span>:  <span class="pl-s">^/api/v1/login</span>
             <span class="pl-ent">stateless</span>: <span class="pl-c1">true</span>
             <span class="pl-ent">anonymous</span>: <span class="pl-c1">true</span>
             <span class="pl-ent">json_login</span>:
-                <span class="pl-ent">check_path</span>:               <span class="pl-s">/api/login_check</span>
+                <span class="pl-ent">check_path</span>:               <span class="pl-s">/api/v1/login</span>
                 <span class="pl-ent">success_handler</span>:          <span class="pl-s">lexik_jwt_authentication.handler.authentication_success</span>
                 <span class="pl-ent">failure_handler</span>:          <span class="pl-s">lexik_jwt_authentication.handler.authentication_failure</span>
  <span class="pl-ent">api</span>:
-            <span class="pl-ent">pattern</span>:   <span class="pl-s">^/api</span>
+            <span class="pl-ent">pattern</span>:   <span class="pl-s">^/api/v1/</span>
             <span class="pl-ent">stateless</span>: <span class="pl-c1">true</span>
             <span class="pl-ent">guard</span>:
                 <span class="pl-ent">authenticators</span>:
                     - <span class="pl-s">lexik_jwt_authentication.jwt_token_authenticator</span>
     <span class="pl-ent">access_control</span>:
-        - <span class="pl-s">{ path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }</span>
-        - <span class="pl-s">{ path: ^/api,       roles: IS_AUTHENTICATED_FULLY }</span></pre></div>
+        - <span class="pl-s">{ path: ^/api/v1/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }</span>
+        - <span class="pl-s">{ path: ^/api/v1,       roles: IS_AUTHENTICATED_FULLY }</span></pre></div>
 <p>Configure your routing into <code>config/routes.yaml</code> :</p>
-<div class="highlight highlight-source-yaml"><pre><span class="pl-ent">api_login_check</span>:
-    <span class="pl-ent">path</span>: <span class="pl-s">/api/login_check</span></pre></div>
+<div class="highlight highlight-source-yaml"><pre><span class="pl-ent">api_login</span>:
+    <span class="pl-ent">path</span>: <span class="pl-s">/api/v1/login_check</span></pre></div>
 <h3>Run the web application</h3>
 <h4>By WebServerBundle</h4>
 <p>Launch the Apache/Php runtime environment by using Symfony via the following command:</p>
