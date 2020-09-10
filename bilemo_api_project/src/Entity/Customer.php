@@ -31,6 +31,15 @@ use Hateoas\Configuration\Annotation as Hateoas;
  *      "list_users",
  *      href = @Hateoas\Route(
  *          "list_user",
+ *          parameters = { "username" = "expr(object.getUsername())" },
+ *          absolute=true
+ *      )
+ * )
+ * 
+ * @Hateoas\Relation(
+ *      "list_phones",
+ *      href = @Hateoas\Route(
+ *          "list_phone",
  *          absolute=true
  *      )
  * )
@@ -87,20 +96,30 @@ class Customer implements UserInterface
     private $users;
 
     /**
+     * @OA\Property(type="string")
      * @ORM\Column(type="string", length=255)
      */
     private $password;
 
     /**
+     * @OA\Property(type="json")
      * @ORM\Column(type="json")
      */
     private $roles = [];
 
     private $salt;
 
+    /**
+     * @OA\Property(type="object")
+     * @ORM\ManyToMany(targetEntity=Phone::class, inversedBy="customers")
+     */
+    private $phones;
+
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
+        $this->phones = new ArrayCollection();
     }
 
 
@@ -211,4 +230,31 @@ class Customer implements UserInterface
     public function eraseCredentials()
     {
     }
+
+    /**
+     * @return Collection|Phone[]
+     */
+    public function getPhones(): Collection
+    {
+        return $this->phones;
+    }
+
+    public function addPhone(Phone $phone): self
+    {
+        if (!$this->phones->contains($phone)) {
+            $this->phones[] = $phone;
+        }
+
+        return $this;
+    }
+
+    public function removePhone(Phone $phone): self
+    {
+        if ($this->phones->contains($phone)) {
+            $this->phones->removeElement($phone);
+        }
+
+        return $this;
+    }
+
 }

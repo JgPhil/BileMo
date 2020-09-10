@@ -43,7 +43,7 @@ class CustomerController extends DefaultController
     {
         $user = $this->getUser();
         if ($user === $customer || $user->getRoles()[0] === 'ROLE_ADMIN') {
-            return $this->requestManager->successResponseWithCache()->setContent($this->serializer->serialize($user, 'json'));
+            return $this->requestManager->successResponseWithCache(3600)->setContent($this->serializer->serialize($user, 'json'));
         } else {
             return $this->json(['message' => 'Access denied'], 403);
         }
@@ -71,33 +71,6 @@ class CustomerController extends DefaultController
             return $this->json(['message' => 'Access denied'], 403);
         }
         $customers = $repo->findAllCustomers($this->requestManager->getPage($request), $this->getParameter('limit'))->getIterator();
-        return $this->requestManager->successResponseWithCache()->setContent($this->serializer->serialize($customers, 'json'));
-    }
-
-    /**
-     * @OA\Get(
-     *      path="/customers/{username]/users",
-     *      security={"bearer"},
-     *      tags={"Admin"},
-     *      @OA\Parameter(ref="#/components/parameters/username"),
-     *      @OA\Parameter(ref="#/components/parameters/page"),
-     *      @OA\Response(
-     *          response="200",
-     *          description="List of users ressource linked to a customer",
-     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/User"))
-     *      ),
-     *      @OA\Response(response="403",ref="#/components/responses/Unauthorized")
-     * )
-     * 
-     * @Route("/customers/{username}/users{page<\d+>?1}", name="list_customer_users", methods={"GET"})
-     */
-    public function customerUserList(Request $request, Customer $customer, UserRepository $repo)
-    {
-        $role = $this->getUser()->getRoles();
-        if ($role[0] !== 'ROLE_ADMIN') {
-            return $this->json(['message' => 'Access denied'], 403);
-        }
-        $users = $repo->findAllCustomerUsers($customer, $this->requestManager->getPage($request), $this->getParameter('limit'))->getIterator();
-        return $this->requestManager->successResponseWithCache()->setContent($this->serializer->serialize($users, 'json'));
+        return $this->requestManager->successResponseWithCache(3600)->setContent($this->serializer->serialize($customers, 'json'));
     }
 }
