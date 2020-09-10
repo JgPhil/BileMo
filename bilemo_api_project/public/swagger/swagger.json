@@ -472,7 +472,7 @@
                         "type": "string"
                     },
                     "roles": {
-                        "type": "json"
+                        "type": "string"
                     },
                     "phones": {
                         "type": "object"

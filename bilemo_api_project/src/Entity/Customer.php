@@ -102,7 +102,7 @@ class Customer implements UserInterface
     private $password;
 
     /**
-     * @OA\Property(type="json")
+     * @OA\Property(type="string")
      * @ORM\Column(type="json")
      */
     private $roles = [];

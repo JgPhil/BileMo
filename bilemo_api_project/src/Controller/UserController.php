@@ -117,7 +117,7 @@ class UserController extends DefaultController
         $this->entityManager->persist($user);
         $customer->addUser($user);
         $this->entityManager->flush();
-        return new Response($this->serializer->serialize($user, 'json'), 201);
+        return new Response($this->serializer->serialize($user, 'json'), 201,['Content-Type' => 'application/json']);
     }
 
 
