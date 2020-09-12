@@ -31,6 +31,40 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *      )
  * )
  * 
+ * @Hateoas\Relation(
+ *      "add_user",
+ *      href = @Hateoas\Route(
+ *          "add_user",
+ *          parameters = { 
+ *              "username" = "expr(object.getCustomer().getUsername())"
+*           },
+ *          absolute=true
+ *      )
+ * )
+ * 
+ * @Hateoas\Relation(
+ *      "update_user",
+ *      href = @Hateoas\Route(
+ *          "update_user",
+ *          parameters = { 
+ *              "id" = "expr(object.getId())",
+ *              "username" = "expr(object.getCustomer().getUsername())",
+ *           },
+ *          absolute=true
+ *      )
+ * )
+ * 
+ * @Hateoas\Relation(
+ *      "delete_user",
+ *      href = @Hateoas\Route(
+ *          "delete_user",
+ *          parameters = { 
+ *              "id" = "expr(object.getId())",
+ *              "username" = "expr(object.getCustomer().getUsername())",
+ *           },
+ *          absolute=true
+ *      )
+ * )
  * 
  * @Hateoas\Relation(
  *      "customer",
@@ -64,7 +98,7 @@ class User
      * @Serializer\Expose
      * 
      * @Assert\NotBlank()
-     * @Assert\Length(min=2, minMessage="Your first name must be at least {{ min }} characters long", max=255, maxMessage="Your first name cannot be longer than {{ max }} characters ")
+     * @Assert\Length(min=2, max=255)
      */
     private $firstName;
 
@@ -75,7 +109,7 @@ class User
      * @Serializer\Expose
      * 
      * @Assert\NotBlank()
-     * @Assert\Length(min=2, minMessage="Your last name must be at least {{ min }} characters long", max=255, maxMessage="Your first name cannot be longer than {{ max }} characters ")
+     * @Assert\Length(min=2, max=255)
      */
     private $lastName;
 
@@ -84,7 +118,7 @@ class User
      * @OA\Property(type="string")
      * @ORM\Column(type="string", length=255)
      * @Serializer\Expose
-     * @Assert\Email(message = "The email '{{ value }}' is not a valid email.")
+     * @Assert\Email()
      */
     private $email;
 
