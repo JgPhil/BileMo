@@ -135,7 +135,8 @@ class PhoneController extends DefaultController
             return $this->json(['message' => 'Access denied'], 403);
         }
         $data = json_decode($request->getContent());
-        $errors = $validator->validate($this->updatePhoneData($phone, $data));
+        $phone = $this->entityUpdater->formatAndUpdate($phone, $data);
+        $errors = $validator->validate($phone);
         if (count($errors)) {
             $errors = $this->serializer->serialize($errors, 'json');
             return new Response($errors, 400, ['Content-Type' => 'application/json']);
@@ -170,9 +171,4 @@ class PhoneController extends DefaultController
         return new Response(null, 204);
     }
 
-
-    private function updatePhoneData(Phone $phone, $data): Phone
-    {
-        return $phone = $this->entityUpdater->formatAndUpdate($phone, $data);
-    }
 }
