@@ -74,8 +74,8 @@ class PhoneController extends DefaultController
      */
     public function index(Request $request, PhoneRepository $phoneRepository)
     {
-        $phones = $phoneRepository->findAllPhones($this->requestManager->getPage($request), $this->getParameter('limit'))->getIterator();
-        return $this->requestManager->successResponseWithCache(3600)->setContent($this->serializer->serialize($phones, 'json'));
+        $phones = $phoneRepository->findAllPhones($this->requestManager->getPage($request), $this->getParameter('limit'))->getIterator(); //fetching a Paginator object with page parameter than ->getIterator()
+        return $this->requestManager->successResponseWithCache(3600)->setContent($this->serializer->serialize($phones, 'json'));    
     }
 
     /**
